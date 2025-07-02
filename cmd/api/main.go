@@ -33,7 +33,8 @@ type GameRecord struct {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	tpl, err := template.ParseFiles("./assets/index.html")
+	// tpl, err := template.ParseFiles("./assets/index.html") for localhost
+	tpl, err := template.ParseFiles("../../assets/index.html") // for render, coz root is set to /cmd/api
 	if err != nil {
 		http.Error(w, "Parsing Error", http.StatusInternalServerError)
 		return
