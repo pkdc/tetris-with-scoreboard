@@ -1,0 +1,155 @@
+:root {
+    --grey:  rgb(189, 176, 176);
+}
+
+body {
+    margin: 0;
+}
+#root {
+    display: grid;
+    grid-gap: 0;
+    grid-template-columns: 1fr 5fr 1fr;
+    width: 100%;
+    height: 100%;
+}
+
+.game-table {
+    margin: 5% auto;
+    display: grid;
+    grid-gap: 0px;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    width: 400px;
+    height: 800px;
+}
+
+.table-pixel {
+    height: 100%;
+    width: 100%;
+    background-color: var(--grey);
+}
+
+.block-group {
+    position: relative;
+    margin: 0 auto;
+}
+
+.block {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    font-size: 0px;
+    /* display: grid;
+    grid-gap: 0; */
+}
+
+.comming-up {
+    height: 100px;
+    width: 100px;
+}
+
+.score-area {
+    background: #ffb300;
+    height: 300px;
+    width: 300px;
+    font-size: 20px;
+    padding: 20px;
+}
+
+.scoreboard {
+    /* display: block; */
+    background-color: grey;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    position: fixed;
+    top: 0;
+    text-align: center;
+
+}
+
+.score-form {
+    margin: 30px;
+    padding: 50px;
+    display: block;
+    background: #72cc2e;
+    font-size: 2em;
+    color: white;
+}
+
+.search {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+.search-label {
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.search-input {
+    font-size: 1.5rem;
+}
+.score-table-header,
+.score-table-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+}
+
+.score-table-header {
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+.h-cell {
+    border-bottom: 5px dashed white;
+    border-right: 5px dashed white;
+}
+.h-cell:last-child {
+    border-bottom: 5px dashed white;
+    border-right: 0px dashed white;
+}
+
+.r-cell {
+    border-right: 5px dashed white;
+}
+.r-cell:nth-of-type(4n) {
+    border-right: 0px dashed white;
+}
+
+.page-nav {
+    display: flex;
+    justify-content: center;
+    margin: 1rem;
+}
+.page-arrow {
+    margin: 0.5rem;
+    padding: 1.2rem;
+    font-weight: 700;
+    font-size: 2.5rem;
+}
+
+.no-result {
+    margin: 0;
+    margin-top: -8rem;
+    padding: 0;
+    font-weight: 700;
+    font-size: 3rem;
+}
+
+.show {
+    opacity: 0.7;
+}
+
+/* .appear {
+    display: block;
+} */
+
+.hide {
+    opacity: 0;
+}
+
+.disappear {
+    display: none;
+}
