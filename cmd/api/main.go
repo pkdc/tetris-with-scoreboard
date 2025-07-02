@@ -233,7 +233,8 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	mux := http.NewServeMux()
-	mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
+	// mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
+	mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("../../assets")))) // for render
 	mux.HandleFunc("/", homeHandler)
 	mux.HandleFunc("/record/", recordHandler)
 
