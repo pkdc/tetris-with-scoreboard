@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"io/fs"
 	"log"
@@ -33,13 +32,13 @@ type GameRecord struct {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// tpl, err := template.ParseFiles("./assets/index.html") for localhost
-	tpl, err := template.ParseFiles("../../assets/index.html") // for render, coz root is set to /cmd/api
-	if err != nil {
-		http.Error(w, "Parsing Error", http.StatusInternalServerError)
-		return
-	}
-	err = tpl.ExecuteTemplate(w, "index.html", nil)
+	// tpl, err := template.ParseFiles("./assets/index.html")
+	// if err != nil {
+	// 	http.Error(w, "Parsing Error", http.StatusInternalServerError)
+	// 	return
+	// }
+	// err = tpl.ExecuteTemplate(w, "index.html", nil)
+	http.ServeFile(w, r, "../../assets/index.html")
 }
 
 func getJsonData(file *os.File, jsonRecords *[]GameRecord) {
