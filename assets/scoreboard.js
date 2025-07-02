@@ -1,6 +1,6 @@
 "use strict"
 
-const recordUrl = "http://localhost:8080/record/";
+const recordUrl = "/record/";
 
 export let score = 0;
 
