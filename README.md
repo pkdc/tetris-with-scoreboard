@@ -2,6 +2,8 @@
 
 This project is a simplified implementation of the classic Tetris game using Vanilla JavaScript. It features core Tetris gameplay mechanics, score handling through a RESTful API, and tests developed using Test-Driven Development (TDD) principles.
 
+** [Play the live game here!](https://tetris-with-scoreboard.onrender.com)**
+
 ## Table of Contents
 
 - [Features](#features)
