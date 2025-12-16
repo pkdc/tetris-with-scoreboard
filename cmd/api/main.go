@@ -238,20 +238,20 @@ func main() {
 	mux.HandleFunc("/", homeHandler)
 	mux.HandleFunc("/record/", recordHandler)
 
-	// fmt.Println("Starting server at port 8080")
+	fmt.Println("Starting server at port 8080")
 
-	// err := http.ListenAndServe(":8080", mux)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	log.Printf("Starting server at port %s", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	err := http.ListenAndServe(":8080", mux)
+	if err != nil {
 		log.Fatal(err)
 	}
+
+	// port := os.Getenv("PORT")
+	// if port == "" {
+	// 	port = "8080"
+	// }
+
+	// log.Printf("Starting server at port %s", port)
+	// if err := http.ListenAndServe(":"+port, mux); err != nil {
+	// 	log.Fatal(err)
+	// }
 }
