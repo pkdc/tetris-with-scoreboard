@@ -18,6 +18,34 @@ const box1 = document.createElement("div");
 const box2 = document.createElement("div");
 const box3 = document.createElement("div");
 
+// Create start screen overlay
+const startScreen = document.createElement("div");
+startScreen.className = "fixed inset-0 bg-game-darker/95 backdrop-blur-sm z-50 flex items-center justify-center";
+startScreen.id = "start-screen";
+
+const startContent = document.createElement("div");
+startContent.className = "text-center space-y-6";
+
+const title = document.createElement("h1");
+title.className = "text-6xl font-black text-game-accent mb-8 drop-shadow-[0_0_20px_rgba(0,255,136,0.8)]";
+title.textContent = "TETRIS";
+title.style.letterSpacing = "8px";
+
+const instructions = document.createElement("div");
+instructions.className = "text-xl text-white space-y-3 mb-8";
+instructions.innerHTML = `
+    <p class="text-game-blue font-semibold">Controls:</p>
+    <p>↑ Arrow - Rotate</p>
+    <p>← → Arrows - Move</p>
+    <p>↓ Arrow - Fast Drop</p>
+    <p>Backspace - Open Menu</p>
+    <p class="mt-6 text-game-accent font-bold text-2xl">Press ENTER to Start</p>
+`;
+
+startContent.append(title, instructions);
+startScreen.append(startContent);
+root.append(startScreen);
+
 root.append(box1);
 root.append(box2);
 root.append(box3);
@@ -27,19 +55,25 @@ const scoreArea = document.createElement("div");
 const scoreDisplay = document.createElement("p");
 scoreDisplay.id = "score-display";
 scoreDisplay.textContent = `Score: ${score}`;
+scoreDisplay.className = "text-3xl font-bold text-game-accent mb-4 drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
 // const timeText = document.createElement("p");
 // timeText.textContent = "Time";
 // timeText.style.display = "span";
 const timeDisplay = document.createElement("p");
 timeDisplay.textContent = `00:00`;
 timeDisplay.id = "time-display";
-scoreArea.classList.add("score-area");
+timeDisplay.className = "text-2xl font-semibold text-game-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]";
+scoreArea.className = "bg-game-dark/80 backdrop-blur-sm border-2 border-game-accent/50 rounded-xl p-6 shadow-[0_0_30px_rgba(0,255,136,0.3)] min-w-[280px]";
 scoreArea.append(scoreDisplay,  timeDisplay);
+box1.className = "flex items-center justify-center p-4";
 box1.append(scoreArea);
 
 // gameBoard
 const gameBoard = new gameArea(10, 20);
-box2.append(gameBoard.generateTable());
+const gameBoardElement = gameBoard.generateTable();
+gameBoardElement.className = "game-table border-4 border-game-purple/70 rounded-lg shadow-[0_0_40px_rgba(139,92,246,0.5)] bg-game-dark/50 p-2";
+box2.className = "flex items-center justify-center p-4";
+box2.append(gameBoardElement);
 
 const slowDrop = function() {
     // console.log("slow");
@@ -149,6 +183,15 @@ document.addEventListener("keydown", (e) => {
         // To prevent run being called multiple times
         if (!started) {
             started = true;
+            // Hide start screen
+            const startScreen = document.getElementById("start-screen");
+            if (startScreen) {
+                startScreen.style.opacity = "0";
+                startScreen.style.transition = "opacity 0.5s ease";
+                setTimeout(() => {
+                    startScreen.style.display = "none";
+                }, 500);
+            }
             gameTimer = new timer(Date.now());
             run();
             // startedID = requestAnimationFrame(run);

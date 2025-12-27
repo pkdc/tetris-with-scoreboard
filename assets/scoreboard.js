@@ -116,21 +116,21 @@ const updateScoreBoard = function(cur, data) {
     recordForm.addEventListener("submit", preventRefresh);
 
     const searchDiv = document.createElement("div");
-    searchDiv.classList.add("search");
+    searchDiv.className = "search";
     const searchLabelDiv = document.createElement("div");
-    searchLabelDiv.classList.add("search-label");
+    searchLabelDiv.className = "search-label";
     const searchLabel = document.createElement("label");
     searchLabel.textContent = "Search records: ";
     searchLabel.setAttribute("for", "search");
     searchLabelDiv.append(searchLabel);
     const searchInputDiv = document.createElement("div");
-    searchInputDiv.classList.add("search-input");
+    searchInputDiv.className = "search-input";
     const searchInput = document.createElement("input");
     searchInput.setAttribute("id", "search");
     searchInput.setAttribute("type", "text");
     searchInput.setAttribute("name", "search");
     searchInput.setAttribute("placeholder", "Name");
-    searchInput.classList.add("search-input");
+    searchInput.className = "search-input";
     searchInputDiv.append(searchInput);
     searchDiv.append(searchLabelDiv, searchInputDiv);
 
@@ -163,7 +163,9 @@ const updateScoreBoard = function(cur, data) {
     const percent = Math.round(curRecordRank*100/data.length);
 
     const endMsgDiv = document.createElement("div");
+    endMsgDiv.className = "mb-6";
     const endMsg = document.createElement("h2");
+    endMsg.className = "text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
     endMsg.textContent = `Congratz ${cur.pname} you are in the top ${percent}%, on the ${curRecordRank} position.`;
     endMsgDiv.append(endMsg);
 
