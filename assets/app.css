@@ -21,13 +21,25 @@ body {
 @media (max-width: 768px) {
     #root {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: auto 1fr;
         height: auto;
         min-height: 100vh;
     }
 
-    /* Hide box3 on mobile */
-    #root > div:nth-child(3) {
+    /* Stack score area on top of game board on mobile */
+    .score-box {
+        grid-row: 1;
+        order: 1;
+    }
+
+    /* Game board appears below score area on mobile */
+    .game-box {
+        grid-row: 2;
+        order: 2;
+    }
+
+    /* Hide side box on mobile */
+    .side-box {
         display: none;
     }
 }

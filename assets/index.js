@@ -46,10 +46,6 @@ startContent.append(title, instructions);
 startScreen.append(startContent);
 root.append(startScreen);
 
-root.append(box1);
-root.append(box2);
-root.append(box3);
-
 // scoreArea
 const scoreArea = document.createElement("div");
 const scoreDisplay = document.createElement("p");
@@ -65,14 +61,19 @@ timeDisplay.id = "time-display";
 timeDisplay.className = "text-lg md:text-2xl font-semibold text-game-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]";
 scoreArea.className = "bg-game-dark/80 backdrop-blur-sm border-2 border-game-accent/50 rounded-xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,136,0.3)] w-full max-w-[280px]";
 scoreArea.append(scoreDisplay,  timeDisplay);
-box1.className = "flex items-center justify-center p-2 md:p-4";
+box1.className = "score-box flex items-center justify-center p-2 md:p-4";
 box1.append(scoreArea);
+
+root.append(box1);
+root.append(box2);
+root.append(box3);
 
 // gameBoard
 const gameBoard = new gameArea(10, 20);
 const gameBoardElement = gameBoard.generateTable();
 gameBoardElement.className = "game-table border-4 border-game-purple/70 rounded-lg shadow-[0_0_40px_rgba(139,92,246,0.5)] bg-game-dark/50 p-2";
-box2.className = "flex items-center justify-center p-2 md:p-4";
+box2.className = "game-box flex items-center justify-center p-2 md:p-4";
+box3.className = "side-box";
 box2.append(gameBoardElement);
 
 const slowDrop = function() {
