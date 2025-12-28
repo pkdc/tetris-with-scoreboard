@@ -179,6 +179,11 @@ const run = function() {
 
 // press "Enter" to start game
 document.addEventListener("keydown", (e) => {
+    // Don't start game if scoreboard is visible (player might be typing)
+    if (scoreBoardDiv.classList.contains("show")) {
+        return;
+    }
+
     if (e.key === "Enter") {
         // To prevent run being called multiple times
         if (!started) {

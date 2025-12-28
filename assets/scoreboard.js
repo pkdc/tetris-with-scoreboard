@@ -328,6 +328,14 @@ recordForm.classList.add("score-form");
 // recordForm.setAttribute("action", endpoint);
 // recordForm.setAttribute("method", method);
 recordForm.addEventListener("submit", submitHandler);
+// Prevent Enter key from submitting form - only allow button click
+recordForm.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && e.target.tagName !== "BUTTON") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+});
 
 // gameover text
 const gameoverText = document.createElement('h1');
@@ -352,6 +360,14 @@ const enterNameInput = document.createElement('input');
 enterNameInput.setAttribute("type", "text");
 enterNameInput.setAttribute("name", "pname");
 enterNameInput.setAttribute("id", "name");
+// Prevent Enter key from submitting form - user must click submit button
+enterNameInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+});
 enterNameInputDiv.append(enterNameInput);
 
 // score label
