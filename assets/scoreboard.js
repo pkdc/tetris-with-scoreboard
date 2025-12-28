@@ -296,6 +296,12 @@ const submitHandler = function(e) {
     const payload = Object.fromEntries(formFields.entries());
     console.log("payload: ", payload);
 
+    // Validate player name is not empty
+    if (!payload.pname || payload.pname.trim() === "") {
+        alert("Please enter your name before submitting.");
+        return;
+    }
+
     // console.log("pay Json", JSON.stringify(payload))
     const reqOptions = {
         method: "POST",
@@ -306,14 +312,24 @@ const submitHandler = function(e) {
     // since the API will return the latest records
     // const testUrl = "http://httpbin.org/post";
     fetch(recordUrl, reqOptions)
-    .then(() => showUpdatedScoreBoard(payload))
+    .then((response) => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(text || `Server error: ${response.status}`);
+            });
+        }
+        return showUpdatedScoreBoard(payload);
+    })
     // .then(req => req.json())
     // .then(data => {
     //     console.log("returned data: ", data);
     //     // updateScoreBoard(payload, data);
     //     showUpdatedScoreBoard(payload);
     // })
-    .catch((err) => console.log(`Failed to submit record for storing ${err}`));
+    .catch((err) => {
+        console.log(`Failed to submit record for storing ${err}`);
+        alert(`Error: ${err.message}. Please try again.`);
+    });
 }
 
 const body = document.querySelector("body");

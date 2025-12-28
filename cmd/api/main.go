@@ -93,6 +93,10 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 			var payload gameRecordPayload
 
 			err := json.NewDecoder(r.Body).Decode(&payload)
+			if err != nil {
+				http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
+				return
+			}
 
 			fmt.Println(payload)
 
@@ -101,9 +105,21 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 			score := payload.GameScore
 			time := payload.GameTime
 
+			// Validate required fields
+			if idStr == "" {
+				http.Error(w, "ID is required", http.StatusBadRequest)
+				return
+			}
+
+			if strings.TrimSpace(pname) == "" {
+				http.Error(w, "Player name is required", http.StatusBadRequest)
+				return
+			}
+
 			id, err := strconv.Atoi(idStr)
 			if err != nil {
-				log.Fatal(err)
+				http.Error(w, fmt.Sprintf("Invalid ID format: %s", err.Error()), http.StatusBadRequest)
+				return
 			}
 
 			fmt.Printf("Id: %d\n", id)

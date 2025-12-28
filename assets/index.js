@@ -20,26 +20,26 @@ const box3 = document.createElement("div");
 
 // Create start screen overlay
 const startScreen = document.createElement("div");
-startScreen.className = "fixed inset-0 bg-game-darker/95 backdrop-blur-sm z-50 flex items-center justify-center";
+startScreen.className = "fixed inset-0 bg-game-darker/95 backdrop-blur-sm z-50 flex items-center justify-center p-4";
 startScreen.id = "start-screen";
 
 const startContent = document.createElement("div");
-startContent.className = "text-center space-y-6";
+startContent.className = "text-center space-y-6 max-w-md w-full px-4";
 
 const title = document.createElement("h1");
-title.className = "text-6xl font-black text-game-accent mb-8 drop-shadow-[0_0_20px_rgba(0,255,136,0.8)]";
+title.className = "text-4xl md:text-6xl font-black text-game-accent mb-8 drop-shadow-[0_0_20px_rgba(0,255,136,0.8)]";
 title.textContent = "TETRIS";
 title.style.letterSpacing = "8px";
 
 const instructions = document.createElement("div");
-instructions.className = "text-xl text-white space-y-3 mb-8";
+instructions.className = "text-base md:text-xl text-white space-y-3 mb-8";
 instructions.innerHTML = `
     <p class="text-game-blue font-semibold">Controls:</p>
     <p>↑ Arrow - Rotate</p>
     <p>← → Arrows - Move</p>
     <p>↓ Arrow - Fast Drop</p>
     <p>Backspace - Open Menu</p>
-    <p class="mt-6 text-game-accent font-bold text-2xl">Press ENTER to Start</p>
+    <p class="mt-6 text-game-accent font-bold text-xl md:text-2xl">Press ENTER to Start</p>
 `;
 
 startContent.append(title, instructions);
@@ -55,24 +55,24 @@ const scoreArea = document.createElement("div");
 const scoreDisplay = document.createElement("p");
 scoreDisplay.id = "score-display";
 scoreDisplay.textContent = `Score: ${score}`;
-scoreDisplay.className = "text-3xl font-bold text-game-accent mb-4 drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
+scoreDisplay.className = "text-xl md:text-3xl font-bold text-game-accent mb-4 drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
 // const timeText = document.createElement("p");
 // timeText.textContent = "Time";
 // timeText.style.display = "span";
 const timeDisplay = document.createElement("p");
 timeDisplay.textContent = `00:00`;
 timeDisplay.id = "time-display";
-timeDisplay.className = "text-2xl font-semibold text-game-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]";
-scoreArea.className = "bg-game-dark/80 backdrop-blur-sm border-2 border-game-accent/50 rounded-xl p-6 shadow-[0_0_30px_rgba(0,255,136,0.3)] min-w-[280px]";
+timeDisplay.className = "text-lg md:text-2xl font-semibold text-game-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]";
+scoreArea.className = "bg-game-dark/80 backdrop-blur-sm border-2 border-game-accent/50 rounded-xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,136,0.3)] w-full max-w-[280px]";
 scoreArea.append(scoreDisplay,  timeDisplay);
-box1.className = "flex items-center justify-center p-4";
+box1.className = "flex items-center justify-center p-2 md:p-4";
 box1.append(scoreArea);
 
 // gameBoard
 const gameBoard = new gameArea(10, 20);
 const gameBoardElement = gameBoard.generateTable();
 gameBoardElement.className = "game-table border-4 border-game-purple/70 rounded-lg shadow-[0_0_40px_rgba(139,92,246,0.5)] bg-game-dark/50 p-2";
-box2.className = "flex items-center justify-center p-4";
+box2.className = "flex items-center justify-center p-2 md:p-4";
 box2.append(gameBoardElement);
 
 const slowDrop = function() {
