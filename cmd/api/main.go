@@ -31,14 +31,11 @@ type GameRecord struct {
 	GameTime   string `json:"time"`
 }
 
+// basePath is set at startup based on working directory
+var basePath string
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// tpl, err := template.ParseFiles("./assets/index.html")
-	// if err != nil {
-	// 	http.Error(w, "Parsing Error", http.StatusInternalServerError)
-	// 	return
-	// }
-	// err = tpl.ExecuteTemplate(w, "index.html", nil)
-	http.ServeFile(w, r, "../../assets/index.html")
+	http.ServeFile(w, r, basePath+"/index.html")
 }
 
 func getJsonData(file *os.File, jsonRecords *[]GameRecord) {
@@ -247,10 +244,22 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// getBasePath returns the correct base path for assets
+// Works both when run from project root (go run cmd/api/main.go) and from cmd/api (go run main.go)
+func getBasePath() string {
+	// Check if we're in project root (assets folder exists here)
+	if _, err := os.Stat("assets/index.html"); err == nil {
+		return "assets"
+	}
+	// Otherwise assume we're in cmd/api
+	return "../../assets"
+}
+
 func main() {
+	basePath = getBasePath()
+
 	mux := http.NewServeMux()
-	// mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
-	mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir("../../assets")))) // for render
+	mux.Handle("/assets/", http.StripPrefix("/assets", http.FileServer(http.Dir(basePath))))
 	mux.HandleFunc("/", homeHandler)
 	mux.HandleFunc("/record/", recordHandler)
 

@@ -64,11 +64,13 @@ To run this project locally, follow these steps:
 
 3. **API Setup (Optional)**:
 
-   If you want to enable score saving and retrieval, ensure that the Go API service is running. Run:
+   If you want to enable score saving and retrieval, ensure that the Go API service is running:
 
    ```
    go run cmd/api/main.go
    ```
+
+   Then access the game at `http://localhost:8080`.
 
 ## API Endpoints
 
