@@ -10,7 +10,9 @@ body {
 
 #root {
     display: grid;
-    grid-template-columns: 1fr 5fr 1fr;
+    grid-template-columns: auto auto auto;
+    justify-content: space-evenly;
+    align-items: center;
     width: 100%;
     min-height: 100vh;
     background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
@@ -21,7 +23,8 @@ body {
 @media (max-width: 768px) {
     #root {
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+        grid-template-rows: auto auto;
+        align-content: space-evenly;
         height: auto;
         min-height: 100vh;
     }
