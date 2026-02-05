@@ -1,120 +1,184 @@
-# Tetris Game
+# Tetris with Scoreboard
 
-This project is a simplified implementation of the classic Tetris game using Vanilla JavaScript. It features core Tetris gameplay mechanics, score handling through a RESTful API, and tests developed using Test-Driven Development (TDD) principles.
+A classic Tetris game built with vanilla JavaScript, featuring a persistent leaderboard powered by a Go backend. Developed with Test-Driven Development (TDD) practices.
 
-** [Play the live game here!](https://tetris-with-scoreboard.onrender.com)**
+**[Play the Live Demo](https://tetris-with-scoreboard.onrender.com)**
 
-## Table of Contents
-
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Game Controls](#game-controls)
-- [Installation](#installation)
-- [API Endpoints](#api-endpoints)
-- [Testing](#testing)
-- [Future Enhancements](#future-enhancements)
-- [License](#license)
+---
 
 ## Features
 
-- **Core Tetris Gameplay**: Implemented using pure JavaScript and HTML/CSS. Includes block movement, rotation, collision detection, and row clearing.
-- **Score Handling**: A RESTful API service built with Go to manage high scores. Players can submit their scores and retrieve the leaderboard.
-- **Test-Driven Development**: Tests have been written using Jest to support the logic for removing completed rows, ensuring reliability and correctness of the game mechanics.
+- **Classic Tetris Gameplay** - All 6 tetromino shapes with rotation, collision detection, and line clearing
+- **Persistent Leaderboard** - Submit your scores and compete with other players
+- **Responsive Design** - Mobile-friendly interface with Tailwind CSS v4
+- **Real-time Scoring** - Points based on simultaneous line clears (up to 1500 for a Tetris!)
 
-## Technologies Used
+---
 
-- **JavaScript (Vanilla)**: For implementing the game logic and UI.
-- **Go**: For creating the RESTful API service to handle score data.
-- **HTML/CSS**: For structuring and styling the game interface.
-- **Jest**: For testing the game logic.
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Vanilla JavaScript (ES6 modules) |
+| Styling | Tailwind CSS v4, Custom CSS |
+| Backend | Go HTTP Server |
+| Storage | JSON file-based persistence |
+| Testing | Jest with jsdom |
+| Build | esbuild |
+
+---
 
 ## Game Controls
 
-- **Enter**: Start the game. The Tetris blocks will begin to fall.
-- **Backspace**: End the game and display an input form for the leaderboard. Submit your score to see the current standings.
-- **Arrow Keys**:
-  - **Left/Right**: Move the Tetris block sideways.
-  - **Down**: Accelerate the fall of the Tetris block.
-  - **Up**: Rotate the Tetris block.
+| Key | Action |
+|-----|--------|
+| `Enter` | Start game |
+| `Backspace` | End game and submit score |
+| `Left Arrow` | Move block left |
+| `Right Arrow` | Move block right |
+| `Down Arrow` | Fast drop |
+| `Up Arrow` | Rotate block |
 
-## Installation
+---
 
-To run this project locally, follow these steps:
+## Getting Started
 
-1. **Clone the repository**:
+### Prerequisites
 
-   ```
-   git clone https://github.com/pkdc/simplified-tetris.git
-   cd simplified-tetris
-   ```
+- Python 3 (for local development server)
+- Go 1.17+ (for backend API)
+- Node.js (for running tests)
 
-2. **Run the Game**:
+### Quick Start (Frontend Only)
 
-   Start a server by running:
+```bash
+# Clone the repository
+git clone https://github.com/pkdc/tetris-with-scoreboard.git
+cd tetris-with-scoreboard
 
-   ```
-   python3 -m http.server
-   ```
+# Start a local server
+python3 -m http.server
 
-   Enter `localhost:8000` in your web browser.
+# Open in browser
+# Navigate to http://localhost:8000/assets/
+```
 
-   Click on `assets/`, it should open `index.html` automatically (if not, open it manually).
+### Full Setup (with Backend)
 
-   Start playing the game.
+```bash
+# Clone the repository
+git clone https://github.com/pkdc/tetris-with-scoreboard.git
+cd tetris-with-scoreboard
 
-3. **API Setup (Optional)**:
+# Start the Go API server
+go run cmd/api/main.go
 
-   If you want to enable score saving and retrieval, ensure that the Go API service is running:
+# Open in browser
+# Navigate to http://localhost:8080
+```
 
-   ```
-   go run cmd/api/main.go
-   ```
+The backend enables score persistence and leaderboard functionality.
 
-   Then access the game at `http://localhost:8080`.
+---
 
-## API Endpoints
+## API Reference
 
-- **POST /record**: Submit a new score.
+### Submit a Score
 
-  Request Body:
+```http
+POST /record/
+Content-Type: application/json
 
-  ```json
-  {
-    "pname": "Player1",
-    "score": 1500,
-    "time": "2024-08-24T12:00:00Z"
-  }
-  ```
+{
+  "id": "unique-id",
+  "pname": "PlayerName",
+  "score": 1500,
+  "time": "05:30"
+}
+```
 
-- **GET /record**: Retrieve the current leaderboard.
+### Get Leaderboard
 
-## Testing
+```http
+GET /record/
+```
 
-This project follows Test-Driven Development (TDD) practices for the logic behind clearing completed rows. The tests are written using Jest.
+Returns an array of all game records sorted for the leaderboard.
 
-To run the tests:
+---
 
-1. Install the necessary dependencies:
+## Development
 
-   ```
-   npm install
-   ```
+### Running Tests
 
-2. Run the tests:
+```bash
+cd assets
+npm install    # First time only
+npm test
+```
 
-   ```
-   npm test
-   ```
+Tests are written using Jest with TDD principles, focusing on core game mechanics like line clearing.
+
+### Building for Production
+
+```bash
+cd assets
+npm run build
+```
+
+Creates optimized, minified assets in `assets/dist/` using esbuild.
+
+---
+
+## Scoring System
+
+| Lines Cleared | Points |
+|---------------|--------|
+| 1 line | 100 |
+| 2 lines | 300 |
+| 3 lines | 700 |
+| 4 lines (Tetris!) | 1500 |
+
+---
+
+## Project Structure
+
+```
+tetris-with-scoreboard/
+├── assets/
+│   ├── index.html          # Game entry point
+│   ├── index.js            # Main game loop
+│   ├── table.js            # Game board (10x20 grid)
+│   ├── tetris-block.js     # Tetromino logic
+│   ├── scoreboard.js       # Leaderboard UI & API calls
+│   ├── timer.js            # Game timer
+│   ├── app.css             # Custom styles
+│   └── table.test.js       # Jest tests
+├── cmd/
+│   └── api/
+│       └── main.go         # Go HTTP server
+├── record.json             # Score storage
+└── README.md
+```
+
+---
 
 ## Future Enhancements
 
-Some planned improvements include:
+- [ ] Next block preview
+- [ ] Sound effects
+- [ ] Ghost piece (drop preview)
+- [ ] Level progression with increasing speed
+- [ ] Expanded test coverage
 
-- Block Previews: Display the next block to be dropped.
-- Sound Effects: Add sound effects for block placement and row clearing.
-- Enhanced UI: Introduce animations and a more polished game interface.
-- Additional Testing: Expand test coverage to include other game features.
+---
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  Made with vanilla JavaScript and Go
+</p>
