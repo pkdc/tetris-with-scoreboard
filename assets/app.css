@@ -167,6 +167,7 @@ body {
     padding: 20px;
     text-align: center;
     opacity: 0;
+    pointer-events: none;
     overflow-y: auto;
     overflow-x: hidden;
     transition: opacity 0.3s ease;
@@ -183,7 +184,7 @@ body {
     .scoreboard { padding: 5px 5px 10px; }
 }
 
-.scoreboard.show { opacity: 1; }
+.scoreboard.show { opacity: 1; pointer-events: auto; }
 
 /* ===========================================
    SCORE FORM

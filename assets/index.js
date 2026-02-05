@@ -149,6 +149,9 @@ const rotateTBlock = function() {
 
 
 document.addEventListener("keydown", (e) => {
+    // Only allow controls if game has started
+    if (!started) return;
+
     if (e.key === "ArrowDown") {
         console.log("fastDrop");
         fastDrop();
@@ -251,9 +254,9 @@ const enterPlayerName = function() {
     scoreBoardDiv.style.willChange = "auto";
 }
 
-// test
+// Open menu (only works if game has started)
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace") {
+    if (e.key === "Backspace" && started) {
         console.log("Backspace");
         gameover();
     }
