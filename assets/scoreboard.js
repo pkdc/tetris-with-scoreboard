@@ -124,7 +124,6 @@ const updateScoreBoard = function(cur, data) {
     searchLabel.setAttribute("for", "search");
     searchLabelDiv.append(searchLabel);
     const searchInputDiv = document.createElement("div");
-    searchInputDiv.className = "search-input";
     const searchInput = document.createElement("input");
     searchInput.setAttribute("id", "search");
     searchInput.setAttribute("type", "text");
@@ -165,7 +164,8 @@ const updateScoreBoard = function(cur, data) {
     const endMsgDiv = document.createElement("div");
     endMsgDiv.className = "mb-6";
     const endMsg = document.createElement("h2");
-    endMsg.className = "text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
+    endMsg.className = "text-2xl font-arcade text-game-yellow-light";
+    endMsg.style.textShadow = "2px 2px 0 #E5A800";
     endMsg.textContent = `Congratz ${cur.pname} you are in the top ${percent}%, on the ${curRecordRank} position.`;
     endMsgDiv.append(endMsg);
 

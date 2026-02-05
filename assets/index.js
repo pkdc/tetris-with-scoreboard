@@ -20,26 +20,48 @@ const box3 = document.createElement("div");
 
 // Create start screen overlay
 const startScreen = document.createElement("div");
-startScreen.className = "fixed inset-0 bg-game-darker/95 backdrop-blur-sm z-50 flex items-center justify-center p-4";
 startScreen.id = "start-screen";
+startScreen.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 15, 26, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+`;
 
 const startContent = document.createElement("div");
-startContent.className = "text-center space-y-6 max-w-md w-full px-4";
+startContent.style.cssText = "text-align: center; max-width: 28rem; width: 100%; padding: 0 1rem;";
 
 const title = document.createElement("h1");
-title.className = "text-4xl md:text-6xl font-black text-game-accent mb-8 drop-shadow-[0_0_20px_rgba(0,255,136,0.8)]";
 title.textContent = "TETRIS";
-title.style.letterSpacing = "8px";
+title.style.cssText = `
+    font-family: 'Press Start 2P', cursive;
+    font-size: clamp(2rem, 8vw, 4rem);
+    color: #FFD700;
+    margin-bottom: 2rem;
+    letter-spacing: 4px;
+    text-shadow: 4px 4px 0px #FF8C00, 0 0 30px rgba(255, 215, 0, 0.5);
+`;
 
 const instructions = document.createElement("div");
-instructions.className = "text-base md:text-xl text-white space-y-3 mb-8";
+instructions.style.cssText = `
+    font-family: 'VT323', monospace;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: white;
+    line-height: 2;
+    margin-bottom: 2rem;
+`;
 instructions.innerHTML = `
-    <p class="text-game-blue font-semibold">Controls:</p>
-    <p>↑ Arrow - Rotate</p>
-    <p>← → Arrows - Move</p>
-    <p>↓ Arrow - Fast Drop</p>
+    <p style="color: #FF8C00; font-weight: 600; font-size: 1.5em; margin-bottom: 1rem;">Controls:</p>
+    <p>UP Arrow - Rotate</p>
+    <p>LEFT / RIGHT - Move</p>
+    <p>DOWN Arrow - Fast Drop</p>
     <p>Backspace - Open Menu</p>
-    <p class="mt-6 text-game-accent font-bold text-xl md:text-2xl">Press ENTER to Start</p>
+    <p style="margin-top: 2rem; color: #FFD700; font-family: 'Press Start 2P', cursive; font-size: 0.9em; animation: pulse 2s infinite;">Press ENTER to Start</p>
 `;
 
 startContent.append(title, instructions);
@@ -51,17 +73,18 @@ const scoreArea = document.createElement("div");
 const scoreDisplay = document.createElement("p");
 scoreDisplay.id = "score-display";
 scoreDisplay.textContent = `Score: ${score}`;
-scoreDisplay.className = "text-xl md:text-3xl font-bold text-game-accent mb-4 drop-shadow-[0_0_10px_rgba(0,255,136,0.5)]";
+scoreDisplay.className = "text-2xl md:text-4xl font-arcade text-game-yellow mb-4";
+scoreDisplay.style.textShadow = "2px 2px 0 #FF8C00";
 // const timeText = document.createElement("p");
 // timeText.textContent = "Time";
 // timeText.style.display = "span";
 const timeDisplay = document.createElement("p");
 timeDisplay.textContent = `00:00`;
 timeDisplay.id = "time-display";
-timeDisplay.className = "text-lg md:text-2xl font-semibold text-game-blue drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]";
-scoreArea.className = "bg-game-dark/80 backdrop-blur-sm border-2 border-game-accent/50 rounded-xl p-4 md:p-6 shadow-[0_0_30px_rgba(0,255,136,0.3)] w-full max-w-[280px]";
+timeDisplay.className = "text-xl md:text-3xl font-arcade text-game-teal";
+scoreArea.className = "bg-game-card/90 backdrop-blur-sm border-4 border-game-yellow rounded-xl p-4 md:p-6 shadow-[0_0_30px_rgba(255,215,0,0.3)] w-full max-w-[280px]";
 scoreArea.append(scoreDisplay,  timeDisplay);
-box1.className = "score-box flex items-center justify-center p-2 md:p-4";
+box1.className = "score-box flex items-center justify-center p-2 md:p-4 hidden";
 box1.append(scoreArea);
 
 root.append(box1);
@@ -71,9 +94,9 @@ root.append(box3);
 // gameBoard
 const gameBoard = new gameArea(10, 20);
 const gameBoardElement = gameBoard.generateTable();
-gameBoardElement.className = "game-table border-4 border-game-purple/70 rounded-lg shadow-[0_0_40px_rgba(139,92,246,0.5)] bg-game-dark/50 p-2";
-box2.className = "game-box flex items-center justify-center p-2 md:p-4";
-box3.className = "side-box";
+gameBoardElement.className = "game-table border-4 border-game-yellow rounded-lg shadow-[0_0_40px_rgba(255,215,0,0.4)] bg-game-dark/70 p-2";
+box2.className = "game-box flex items-center justify-center p-2 md:p-4 hidden";
+box3.className = "side-box hidden";
 box2.append(gameBoardElement);
 
 const slowDrop = function() {
@@ -198,6 +221,10 @@ document.addEventListener("keydown", (e) => {
                     startScreen.style.display = "none";
                 }, 500);
             }
+            // Show game elements
+            box1.classList.remove("hidden");
+            box2.classList.remove("hidden");
+            box3.classList.remove("hidden");
             gameTimer = new timer(Date.now());
             run();
             // startedID = requestAnimationFrame(run);
@@ -207,14 +234,14 @@ document.addEventListener("keydown", (e) => {
 
 curBlocks = tetrisBlock.newBlocks(curBlocks, gameBoard);
 // gameTimer = new timer(Date.now()); // not the same as the one runninng
-    // next comming up window
-    // const commingUp = document.createElement("div");
-    // commingUp.classList.add("comming-up");
-    // commingUp.style.position = "fixed";
-    // commingUp.style.top = "100px";
-    // commingUp.style.left = `${document.documentElement.clientWidth - 100}px`;
-    // commingUp.textContent = "block shape";
-    // wrapper.append(commingUp);
+    // next coming up window
+    // const comingUp = document.createElement("div");
+    // comingUp.classList.add("coming-up");
+    // comingUp.style.position = "fixed";
+    // comingUp.style.top = "100px";
+    // comingUp.style.left = `${document.documentElement.clientWidth - 100}px`;
+    // comingUp.textContent = "block shape";
+    // wrapper.append(comingUp);
 
 const enterPlayerName = function() {
     timeInput.setAttribute("value", `${timeDisplay.textContent}`);

@@ -6,31 +6,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Tailwind CSS v4 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'game-dark': '#0a0a0f',
-                        'game-darker': '#050508',
-                        'game-accent': '#00ff88',
-                        'game-purple': '#8b5cf6',
-                        'game-blue': '#3b82f6',
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Google Fonts - Retro Game Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <!-- css -->
-    <link type="text/css" rel="stylesheet" href="/assets/app.css">
+    <!-- Tailwind CSS v4 -->
+    <script type="module" src="https://esm.sh/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            /* Custom colors */
+            --color-game-dark: #1A1A2E;
+            --color-game-darker: #0F0F1A;
+            --color-game-card: #252540;
+            --color-game-yellow: #FFD700;
+            --color-game-yellow-light: #FFE44D;
+            --color-game-yellow-dark: #E5A800;
+            --color-game-orange: #FF8C00;
+            --color-game-coral: #FF6B6B;
+            --color-game-teal: #20B2AA;
+            --color-game-blue: #4169E1;
+            --color-game-grey: #3A3A5C;
+
+            /* Custom fonts */
+            --font-pixel: "Press Start 2P", cursive;
+            --font-arcade: "VT323", monospace;
+        }
+    </style>
+
+    <!-- Custom game styles -->
+    <link rel="stylesheet" href="/assets/app.css">
 
     <title>Tetris</title>
 </head>
 
-<body class="bg-game-darker text-white min-h-screen overflow-hidden">
+<body class="bg-game-darker text-white min-h-screen overflow-hidden font-arcade">
     <div id="root" class="w-full h-screen flex items-center justify-center">
         <script type="module" src="/assets/index.js"></script>
     </div>

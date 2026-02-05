@@ -229,7 +229,7 @@ class tetrisBlock {
         console.log(`generate new ${rand}`);
 
         switch(rand) {
-          case 0: // rectangle
+          case 0: // rectangle (I-piece) - Cyan
             x1 = gameBoard.getMaxX/2 - 2;
             y1 = 0;
             x2 = gameBoard.getMaxX/2 - 1;
@@ -238,10 +238,10 @@ class tetrisBlock {
             y3 = 0;
             x4 = gameBoard.getMaxX/2 + 1;
             y4 = 0;
-            blockColour = "skyblue";
+            blockColour = "#00CED1";
             shape = "rect";
             break;
-          case 1: // sq
+          case 1: // sq (O-piece) - Golden Yellow
             x1 = gameBoard.getMaxX/2 - 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2;
@@ -250,10 +250,10 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2;
             y4 = 1;
-            blockColour = "yellow";
+            blockColour = "#FFD700";
             shape = "sq";
             break;
-          case 2: // L
+          case 2: // L-piece - Orange
             x1 = gameBoard.getMaxX/2 - 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2 - 1;
@@ -262,10 +262,10 @@ class tetrisBlock {
             y3 = 2;
             x4 = gameBoard.getMaxX/2;
             y4 = 2;
-            blockColour = "orange";
+            blockColour = "#FF8C00";
             shape = "L";
             break;
-          case 3: // T
+          case 3: // T-piece - Orchid Pink
             x1 = gameBoard.getMaxX/2 - 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2;
@@ -274,10 +274,10 @@ class tetrisBlock {
             y3 = 0;
             x4 = gameBoard.getMaxX/2;
             y4 = 1;
-            blockColour = "purple";
+            blockColour = "#DA70D6";
             shape = "T";
             break;
-          case 4: // Z
+          case 4: // Z-piece - Coral Red
             x1 = gameBoard.getMaxX/2 - 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2;
@@ -286,10 +286,10 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2 + 1;
             y4 = 1;
-            blockColour = "red";
+            blockColour = "#FF6B6B";
             shape = "Z";
             break;
-          case 5: // S
+          case 5: // S-piece - Light Green
             x1 = gameBoard.getMaxX/2 + 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2;
@@ -298,10 +298,10 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2 - 1;
             y4 = 1;
-            blockColour = "green";
+            blockColour = "#90EE90";
             shape = "S";
             break;
-          case 6: // L-inverse
+          case 6: // J-piece (L-inverse) - Cornflower Blue
             x1 = gameBoard.getMaxX/2 + 1;
             y1 = 0;
             x2 = gameBoard.getMaxX/2 + 1;
@@ -310,7 +310,7 @@ class tetrisBlock {
             y3 = 2;
             x4 = gameBoard.getMaxX/2;
             y4 = 2;
-            blockColour = "blue";
+            blockColour = "#6495ED";
             shape = "L-inverse";
             break;
         }
