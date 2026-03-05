@@ -376,6 +376,7 @@ const enterNameInput = document.createElement('input');
 enterNameInput.setAttribute("type", "text");
 enterNameInput.setAttribute("name", "pname");
 enterNameInput.setAttribute("id", "name");
+enterNameInput.setAttribute("maxlength", "50");
 // Prevent Enter key from submitting form - user must click submit button
 enterNameInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {

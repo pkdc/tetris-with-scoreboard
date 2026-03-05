@@ -55,14 +55,27 @@ instructions.style.cssText = `
     line-height: 2;
     margin-bottom: 2rem;
 `;
-instructions.innerHTML = `
-    <p style="color: #FF8C00; font-weight: 600; font-size: 1.5em; margin-bottom: 1rem;">Controls:</p>
-    <p>UP Arrow - Rotate</p>
-    <p>LEFT / RIGHT - Move</p>
-    <p>DOWN Arrow - Fast Drop</p>
-    <p>Backspace - Open Menu</p>
-    <p style="margin-top: 2rem; color: #FFD700; font-family: 'Press Start 2P', cursive; font-size: 0.9em; animation: pulse 2s infinite;">Press ENTER to Start</p>
-`;
+const controlsHeader = document.createElement("p");
+controlsHeader.style.cssText = "color: #FF8C00; font-weight: 600; font-size: 1.5em; margin-bottom: 1rem;";
+controlsHeader.textContent = "Controls:";
+
+const controlLines = [
+    "UP Arrow - Rotate",
+    "LEFT / RIGHT - Move",
+    "DOWN Arrow - Fast Drop",
+    "Backspace - Open Menu"
+];
+const controlElements = controlLines.map(text => {
+    const p = document.createElement("p");
+    p.textContent = text;
+    return p;
+});
+
+const startPrompt = document.createElement("p");
+startPrompt.style.cssText = "margin-top: 2rem; color: #FFD700; font-family: 'Press Start 2P', cursive; font-size: 0.9em; animation: pulse 2s infinite;";
+startPrompt.textContent = "Press ENTER to Start";
+
+instructions.append(controlsHeader, ...controlElements, startPrompt);
 
 startContent.append(title, instructions);
 startScreen.append(startContent);

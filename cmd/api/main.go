@@ -11,11 +11,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 )
-
-// type GRecords struct {
-// 	GameRecords []GameRecord `json:"game_records"`
-// }
 
 type gameRecordPayload struct {
 	Id         string `json:"id"`
@@ -34,73 +31,118 @@ type GameRecord struct {
 // basePath is set at startup based on working directory
 var basePath string
 
+// fileMu protects concurrent access to record.json
+var fileMu sync.Mutex
+
+// maxPlayerNameLen limits player name length to prevent abuse
+const maxPlayerNameLen = 50
+
+// maxRecords limits the total number of stored records
+const maxRecords = 10000
+
+// maxRequestBodySize limits request body to 1KB
+const maxRequestBodySize = 1024
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, basePath+"/index.html")
 }
 
-func getJsonData(file *os.File, jsonRecords *[]GameRecord) {
+func getJsonData(file *os.File, jsonRecords *[]GameRecord) error {
+	byteRecord, err := io.ReadAll(file)
+	if err != nil {
+		return fmt.Errorf("failed to read file: %w", err)
+	}
+	if err := json.Unmarshal(byteRecord, jsonRecords); err != nil {
+		return fmt.Errorf("failed to parse JSON: %w", err)
+	}
+	return nil
+}
 
-	// get the records from record.json
-	byteRecord, _ := io.ReadAll(file)
-	json.Unmarshal(byteRecord, jsonRecords)
-	// for _, r := range *jsonRecords {
-	// 	fmt.Printf("prev records: %v\n", r)
-	// }
+// sanitizeName trims whitespace and enforces length limit
+func sanitizeName(name string) string {
+	name = strings.TrimSpace(name)
+	if len(name) > maxPlayerNameLen {
+		name = name[:maxPlayerNameLen]
+	}
+	return name
+}
+
+// validateScore checks that a score string is a valid non-negative integer
+func validateScore(score string) bool {
+	if score == "" {
+		return false
+	}
+	n, err := strconv.Atoi(score)
+	return err == nil && n >= 0
+}
+
+// validateTime checks that a time string matches MM:SS format
+func validateTime(t string) bool {
+	if len(t) != 5 || t[2] != ':' {
+		return false
+	}
+	_, err1 := strconv.Atoi(t[:2])
+	_, err2 := strconv.Atoi(t[3:])
+	return err1 == nil && err2 == nil
 }
 
 func recordHandler(w http.ResponseWriter, r *http.Request) {
-	// fmt.Printf("-------method---------%s\n", r.Method)
 	if r.Method != http.MethodPost && r.Method != http.MethodGet {
-		http.Error(w, "Bad request", http.StatusBadRequest)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
 	}
 
 	if r.URL.Path == "/record/" {
-		// Get to get
-		// not used
 		if r.Method == http.MethodGet {
-			fmt.Printf("----record-GET-----\n")
+			fileMu.Lock()
+			defer fileMu.Unlock()
 
 			var Records []GameRecord
 			f, err := os.OpenFile("record.json", os.O_RDONLY, 0644)
 			if errors.Is(err, fs.ErrNotExist) {
 				http.Error(w, "Please play the game first", http.StatusBadRequest)
-			} else {
-				// get the records from record.json
-				getJsonData(f, &Records)
-
-				js, err := json.MarshalIndent(Records, "", "\t")
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				// respond with json
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusOK)
-				w.Write(js)
+				return
 			}
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error opening record.json: %v", err)
+				return
+			}
+			defer f.Close()
+
+			if err := getJsonData(f, &Records); err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error reading records: %v", err)
+				return
+			}
+
+			js, err := json.MarshalIndent(Records, "", "\t")
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error marshaling records: %v", err)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write(js)
 		}
 
-		// Post to store, and then return
 		if r.Method == http.MethodPost {
-			fmt.Printf("----record-POST-----\n")
-			// err := r.ParseForm()
-			// if err != nil {
-			// 	log.Fatal(err)
-			// }
-			var payload gameRecordPayload
+			// Limit request body size to prevent memory exhaustion
+			r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodySize)
 
+			var payload gameRecordPayload
 			err := json.NewDecoder(r.Body).Decode(&payload)
 			if err != nil {
 				http.Error(w, "Invalid JSON payload", http.StatusBadRequest)
 				return
 			}
 
-			fmt.Println(payload)
-
 			idStr := payload.Id
-			pname := payload.PlayerName
+			pname := sanitizeName(payload.PlayerName)
 			score := payload.GameScore
-			time := payload.GameTime
+			gameTime := payload.GameTime
 
 			// Validate required fields
 			if idStr == "" {
@@ -108,31 +150,41 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if strings.TrimSpace(pname) == "" {
+			if pname == "" {
 				http.Error(w, "Player name is required", http.StatusBadRequest)
 				return
 			}
 
 			id, err := strconv.Atoi(idStr)
 			if err != nil {
-				http.Error(w, fmt.Sprintf("Invalid ID format: %s", err.Error()), http.StatusBadRequest)
+				http.Error(w, "Invalid ID format", http.StatusBadRequest)
 				return
 			}
 
-			fmt.Printf("Id: %d\n", id)
-			// pname := r.PostForm.Get("pname")
-			fmt.Printf("Name: %s\n", pname)
-			// score := r.PostForm.Get("score")
-			fmt.Printf("Score: %s\n", score)
-			// time := r.PostForm.Get("time")
-			fmt.Printf("Time: %s\n", time)
+			if id < 0 {
+				http.Error(w, "Invalid ID", http.StatusBadRequest)
+				return
+			}
+
+			if !validateScore(score) {
+				http.Error(w, "Invalid score format", http.StatusBadRequest)
+				return
+			}
+
+			if !validateTime(gameTime) {
+				http.Error(w, "Invalid time format", http.StatusBadRequest)
+				return
+			}
 
 			curRecord := GameRecord{
 				Id:         id,
 				PlayerName: pname,
 				GameScore:  score,
-				GameTime:   time,
+				GameTime:   gameTime,
 			}
+
+			fileMu.Lock()
+			defer fileMu.Unlock()
 
 			// try to open to read
 			f, err := os.OpenFile("record.json", os.O_RDONLY, 0444)
@@ -142,27 +194,19 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 				var Records []GameRecord
 				Records = append(Records, curRecord)
 
-				for _, r := range Records {
-					fmt.Printf("first record: %v\n", r)
-				}
-
 				js, err := json.MarshalIndent(Records, "", "\t")
 				if err != nil {
-					log.Fatal(err)
+					http.Error(w, "Internal server error", http.StatusInternalServerError)
+					log.Printf("Error marshaling records: %v", err)
+					return
 				}
 
 				err = os.WriteFile("record.json", js, 0644)
 				if err != nil {
-					log.Fatal(err)
+					http.Error(w, "Internal server error", http.StatusInternalServerError)
+					log.Printf("Error writing record.json: %v", err)
+					return
 				}
-
-				f, err := os.OpenFile("record.json", os.O_RDONLY, 0444)
-				if errors.Is(err, fs.ErrNotExist) {
-					log.Fatal(err)
-				}
-				defer f.Close()
-
-				getJsonData(f, &Records)
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
@@ -170,77 +214,99 @@ func recordHandler(w http.ResponseWriter, r *http.Request) {
 
 				return
 			}
+			if err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error opening record.json: %v", err)
+				return
+			}
 			defer f.Close()
 
 			// if file exist
 			var Records []GameRecord
-			// var recordStr string
 
-			// get the records from record.json
-			getJsonData(f, &Records)
+			if err := getJsonData(f, &Records); err != nil {
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error reading records: %v", err)
+				return
+			}
+
+			// Prevent unbounded file growth
+			if len(Records) >= maxRecords {
+				http.Error(w, "Maximum number of records reached", http.StatusConflict)
+				return
+			}
 
 			Records = append(Records, curRecord)
 
-			// fmt.Println("---------------------------------")
-			// for _, r := range Records {
-			// 	fmt.Printf("after records: %v\n", r)
-			// }
-
 			js, err := json.MarshalIndent(Records, "", "\t")
 			if err != nil {
-				log.Fatal(err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error marshaling records: %v", err)
+				return
 			}
 
 			err = os.WriteFile("record.json", js, 0644)
 			if err != nil {
-				log.Fatal(err)
+				http.Error(w, "Internal server error", http.StatusInternalServerError)
+				log.Printf("Error writing record.json: %v", err)
+				return
 			}
-			// f.Write([]byte('\n'))
-
-			// For testing: send back the most updated records
-			// w.Header().Set("Content-Type", "application/json")
-			// w.WriteHeader(http.StatusOK)
-			// w.Write(js)
-
-			// w.Header().Set("Location", "/")
-			// w.WriteHeader(http.StatusSeeOther)
 		}
 	} else {
-		fmt.Println("Individual record")
 		urlSlice := strings.Split(r.URL.Path, "/")
-		fmt.Printf("%s space, %s is record, id: %s \n", urlSlice[0], urlSlice[1], urlSlice[2])
-		id, err := strconv.Atoi(urlSlice[2])
-		if err != nil {
-			log.Fatal(err)
+		if len(urlSlice) < 3 || urlSlice[2] == "" {
+			http.Error(w, "Invalid record URL", http.StatusBadRequest)
+			return
 		}
 
-		fmt.Printf("----Individual record-GET %d-----\n", id)
+		id, err := strconv.Atoi(urlSlice[2])
+		if err != nil {
+			http.Error(w, "Invalid record ID", http.StatusBadRequest)
+			return
+		}
+
+		if id < 0 {
+			http.Error(w, "Invalid record ID", http.StatusBadRequest)
+			return
+		}
+
+		fileMu.Lock()
+		defer fileMu.Unlock()
 
 		var Records []GameRecord
 		f, err := os.OpenFile("record.json", os.O_RDONLY, 0644)
 		if errors.Is(err, fs.ErrNotExist) {
 			http.Error(w, "Requested Game Record doesn't exist", http.StatusBadRequest)
-		} else {
-			// get the records from record.json
-			getJsonData(f, &Records)
-
-			// fmt.Println("Records[id]")
-
-			if id >= len(Records) {
-				http.Error(w, "Requested Game Record doesn't exist", http.StatusBadRequest)
-				return
-			}
-
-			js, err := json.MarshalIndent(Records[id], "", "\t")
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// respond with json
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			w.Write(js)
+			return
 		}
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			log.Printf("Error opening record.json: %v", err)
+			return
+		}
+		defer f.Close()
+
+		if err := getJsonData(f, &Records); err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			log.Printf("Error reading records: %v", err)
+			return
+		}
+
+		if id >= len(Records) {
+			http.Error(w, "Requested Game Record doesn't exist", http.StatusBadRequest)
+			return
+		}
+
+		js, err := json.MarshalIndent(Records[id], "", "\t")
+		if err != nil {
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			log.Printf("Error marshaling record: %v", err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(js)
 	}
 }
 
