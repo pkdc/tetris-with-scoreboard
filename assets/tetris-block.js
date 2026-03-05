@@ -1,6 +1,10 @@
 "use strict";
 import {nextRound} from './scoreboard.js';
 import Block from './block.js';
+
+// Next piece queue
+let nextPieceData = null;
+
 class tetrisBlock {
     constructor(x1, y1, x2, y2, x3, y3, x4, y4, blockColour, shape, locked, end) {
         this.blocks = [
@@ -14,7 +18,6 @@ class tetrisBlock {
         this.locked = locked;
         this.end = end;
         this.rotation = 0; // 0, 90, 180, 270 degrees
-        // this.canMove = canMove;
       }
 
       // get getBlock1() {return {x: _x1, y: _y1};}
@@ -143,16 +146,67 @@ class tetrisBlock {
       }
 
       erase() {
+        // Erase ghost first
+        this.eraseGhost();
         this.blocks.forEach((block => {
           let domBlock = document.querySelector(`.x-${block.x}.y-${block.y}`)
-          domBlock.style.background = "var(--grey)";
+          if (domBlock) {
+            domBlock.style.background = "var(--grey)";
+            domBlock.classList.remove("active-piece");
+          }
         }))
       }
 
       colour() {
+        // Draw ghost first (so it's behind)
+        this.drawGhost();
         this.blocks.forEach((block) => {
           let domBlock = document.querySelector(`.x-${block.x}.y-${block.y}`);
-          domBlock.style.background = this.blockColour;
+          if (domBlock) {
+            domBlock.style.background = this.blockColour;
+            domBlock.classList.add("active-piece");
+          }
+        });
+      }
+
+      // Ghost piece - shows where block will land
+      getGhostPositions() {
+        let ghostBlocks = this.blocks.map(b => ({x: b.x, y: b.y}));
+        let canDrop = true;
+        while (canDrop) {
+          for (const block of ghostBlocks) {
+            const nextY = block.y + 1;
+            const nextEl = document.querySelector(`.x-${block.x}.y-${nextY}`);
+            if (!nextEl || (nextEl.classList.contains("occupied") && !this.blocks.some(b => b.x === block.x && b.y === nextY))) {
+              canDrop = false;
+              break;
+            }
+          }
+          if (canDrop) {
+            ghostBlocks.forEach(b => b.y += 1);
+          }
+        }
+        return ghostBlocks;
+      }
+
+      drawGhost() {
+        const ghostPositions = this.getGhostPositions();
+        ghostPositions.forEach(pos => {
+          const domBlock = document.querySelector(`.x-${pos.x}.y-${pos.y}`);
+          if (domBlock && !this.blocks.some(b => b.x === pos.x && b.y === pos.y)) {
+            domBlock.classList.add("ghost-piece");
+            domBlock.style.setProperty("--ghost-color", this.blockColour);
+          }
+        });
+      }
+
+      eraseGhost() {
+        document.querySelectorAll(".ghost-piece").forEach(el => {
+          el.classList.remove("ghost-piece");
+          el.style.removeProperty("--ghost-color");
+          if (!el.classList.contains("occupied") && !el.classList.contains("active-piece")) {
+            el.style.background = "var(--grey)";
+          }
         });
       }
 
@@ -217,119 +271,135 @@ class tetrisBlock {
         this.colour();
       }
 
-      // generate
-      static generateTBlock(gameBoard) {
-        nextRound(gameBoard);
-        console.log("maxX", gameBoard.getMaxX);
+      // Get the shape data for a given random number (used for preview)
+      static getShapeData(rand, maxX) {
         let x1, y1, x2, y2, x3, y3, x4, y4, blockColour, shape;
-        let locked = false;
-        let end = false;
-        let soon = false;
-        const rand = Math.floor(Math.random()*6);
-        console.log(`generate new ${rand}`);
 
         switch(rand) {
           case 0: // rectangle (I-piece) - Cyan
-            x1 = gameBoard.getMaxX/2 - 2;
+            x1 = maxX/2 - 2;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2 - 1;
+            x2 = maxX/2 - 1;
             y2 = 0;
-            x3 = gameBoard.getMaxX/2;
+            x3 = maxX/2;
             y3 = 0;
-            x4 = gameBoard.getMaxX/2 + 1;
+            x4 = maxX/2 + 1;
             y4 = 0;
             blockColour = "#00CED1";
             shape = "rect";
             break;
           case 1: // sq (O-piece) - Golden Yellow
-            x1 = gameBoard.getMaxX/2 - 1;
+            x1 = maxX/2 - 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2;
+            x2 = maxX/2;
             y2 = 0;
-            x3 = gameBoard.getMaxX/2 - 1;
+            x3 = maxX/2 - 1;
             y3 = 1;
-            x4 = gameBoard.getMaxX/2;
+            x4 = maxX/2;
             y4 = 1;
             blockColour = "#FFD700";
             shape = "sq";
             break;
           case 2: // L-piece - Orange
-            x1 = gameBoard.getMaxX/2 - 1;
+            x1 = maxX/2 - 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2 - 1;
+            x2 = maxX/2 - 1;
             y2 = 1;
-            x3 = gameBoard.getMaxX/2 - 1;
+            x3 = maxX/2 - 1;
             y3 = 2;
-            x4 = gameBoard.getMaxX/2;
+            x4 = maxX/2;
             y4 = 2;
             blockColour = "#FF8C00";
             shape = "L";
             break;
           case 3: // T-piece - Orchid Pink
-            x1 = gameBoard.getMaxX/2 - 1;
+            x1 = maxX/2 - 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2;
+            x2 = maxX/2;
             y2 = 0;
-            x3 = gameBoard.getMaxX/2 + 1;
+            x3 = maxX/2 + 1;
             y3 = 0;
-            x4 = gameBoard.getMaxX/2;
+            x4 = maxX/2;
             y4 = 1;
             blockColour = "#DA70D6";
             shape = "T";
             break;
           case 4: // Z-piece - Coral Red
-            x1 = gameBoard.getMaxX/2 - 1;
+            x1 = maxX/2 - 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2;
+            x2 = maxX/2;
             y2 = 0;
-            x3 = gameBoard.getMaxX/2;
+            x3 = maxX/2;
             y3 = 1;
-            x4 = gameBoard.getMaxX/2 + 1;
+            x4 = maxX/2 + 1;
             y4 = 1;
             blockColour = "#FF6B6B";
             shape = "Z";
             break;
           case 5: // S-piece - Light Green
-            x1 = gameBoard.getMaxX/2 + 1;
+            x1 = maxX/2 + 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2;
+            x2 = maxX/2;
             y2 = 0;
-            x3 = gameBoard.getMaxX/2;
+            x3 = maxX/2;
             y3 = 1;
-            x4 = gameBoard.getMaxX/2 - 1;
+            x4 = maxX/2 - 1;
             y4 = 1;
             blockColour = "#90EE90";
             shape = "S";
             break;
           case 6: // J-piece (L-inverse) - Cornflower Blue
-            x1 = gameBoard.getMaxX/2 + 1;
+            x1 = maxX/2 + 1;
             y1 = 0;
-            x2 = gameBoard.getMaxX/2 + 1;
+            x2 = maxX/2 + 1;
             y2 = 1;
-            x3 = gameBoard.getMaxX/2 + 1;
+            x3 = maxX/2 + 1;
             y3 = 2;
-            x4 = gameBoard.getMaxX/2;
+            x4 = maxX/2;
             y4 = 2;
             blockColour = "#6495ED";
             shape = "L-inverse";
             break;
         }
-        console.log(x1, y1);
-        console.log(x2, y2);
-        console.log(x3, y3);
-        console.log(x4, y4);
-        return [x1, y1, x2, y2, x3, y3, x4, y4, blockColour, shape, locked, end];
+        return {x1, y1, x2, y2, x3, y3, x4, y4, blockColour, shape};
+      }
+
+      // Generate a random piece number (0-6, all 7 tetrominos)
+      static randomPiece() {
+        return Math.floor(Math.random() * 7);
+      }
+
+      // generate
+      static generateTBlock(gameBoard) {
+        nextRound(gameBoard);
+        const maxX = gameBoard.getMaxX;
+        let locked = false;
+        let end = false;
+
+        // Use next piece if available, otherwise generate random
+        let rand;
+        if (nextPieceData !== null) {
+          rand = nextPieceData;
+        } else {
+          rand = tetrisBlock.randomPiece();
+        }
+
+        // Generate next piece for preview
+        nextPieceData = tetrisBlock.randomPiece();
+
+        const data = tetrisBlock.getShapeData(rand, maxX);
+        return [data.x1, data.y1, data.x2, data.y2, data.x3, data.y3, data.x4, data.y4, data.blockColour, data.shape, locked, end];
+      }
+
+      // Get next piece info for preview display
+      static getNextPieceInfo() {
+        if (nextPieceData === null) return null;
+        return tetrisBlock.getShapeData(nextPieceData, 6);
       }
 
       static newBlocks(curBlocks, gameBoard) {
-        // generate
-        console.log("game maxX", gameBoard.getMaxX);
         curBlocks = new tetrisBlock(...tetrisBlock.generateTBlock(gameBoard));
-        console.log("shape", `${curBlocks.shape}`);
-        console.log("locked?", `${curBlocks.locked}`);
-        // console.log(`blocks created`);
         curBlocks.colour();
-        // console.log(`blocks coloured`);
         return curBlocks;
     }
 };

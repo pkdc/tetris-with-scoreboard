@@ -357,6 +357,55 @@ recordForm.addEventListener("keydown", (e) => {
 const gameoverText = document.createElement('h1');
 gameoverText.textContent = "GAME OVER";
 
+// Stats summary section
+const statsSummary = document.createElement('div');
+statsSummary.id = "game-stats-summary";
+statsSummary.style.cssText = `
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: rgba(15, 15, 26, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 215, 0, 0.15);
+`;
+
+function updateStatsSummary() {
+    const levelEl = document.getElementById("level-display");
+    const linesEl = document.getElementById("lines-display");
+    const levelText = levelEl ? levelEl.textContent : "Level: 1";
+    const linesText = linesEl ? linesEl.textContent : "Lines: 0";
+    statsSummary.innerHTML = `
+        <div style="text-align: center; font-family: 'VT323', monospace; font-size: 1.3rem;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">SCORE</div>
+            <div style="color: #FFD700; font-size: 1.5rem;">${scoreInput.value || 0}</div>
+        </div>
+        <div style="text-align: center; font-family: 'VT323', monospace; font-size: 1.3rem;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">TIME</div>
+            <div style="color: #20B2AA; font-size: 1.5rem;">${timeInput.value || '00:00'}</div>
+        </div>
+        <div style="text-align: center; font-family: 'VT323', monospace; font-size: 1.3rem;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">LEVEL</div>
+            <div style="color: #FF6B6B; font-size: 1.5rem;">${levelText.replace('Level: ', '')}</div>
+        </div>
+        <div style="text-align: center; font-family: 'VT323', monospace; font-size: 1.3rem;">
+            <div style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">LINES</div>
+            <div style="color: #20B2AA; font-size: 1.5rem;">${linesText.replace('Lines: ', '')}</div>
+        </div>
+    `;
+}
+
+// Update stats when scoreboard is shown via MutationObserver
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' && scoreBoardDiv.classList.contains('show')) {
+            updateStatsSummary();
+        }
+    });
+});
+observer.observe(scoreBoardDiv, { attributes: true });
+
 // id input
 const idInput = document.createElement('input');
 idInput.setAttribute("type", "hidden");
@@ -425,7 +474,13 @@ recordSubmit.textContent = "Submit Name";
 recordSubmit.setAttribute("type", "submit");
 recordSubmitDiv.append(recordSubmit);
 
-recordForm.append(gameoverText, idInput, enterNameLabelDiv, enterNameInputDiv, timeLabelDiv, timeInputDiv, scoreLabelDiv, scoreInputDiv, recordSubmitDiv);
+recordForm.append(gameoverText, statsSummary, idInput, enterNameLabelDiv, enterNameInputDiv, recordSubmitDiv);
+// Hide score and time inputs (shown in stats summary instead)
+scoreInputDiv.style.display = "none";
+timeInputDiv.style.display = "none";
+timeLabelDiv.style.display = "none";
+scoreLabelDiv.style.display = "none";
+recordForm.append(timeLabelDiv, timeInputDiv, scoreLabelDiv, scoreInputDiv);
 scoreBoardDiv.append(recordForm);
 body.append(scoreBoardDiv);
 
