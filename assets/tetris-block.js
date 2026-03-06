@@ -212,9 +212,6 @@ class tetrisBlock {
           });
           this.rotation = (this.rotation + 90) % 360;
         }
-
-        this.erase();
-        this.colour();
       }
 
       // generate
@@ -225,7 +222,7 @@ class tetrisBlock {
         let locked = false;
         let end = false;
         let soon = false;
-        const rand = Math.floor(Math.random()*6);
+        const rand = Math.floor(Math.random()*7);
         console.log(`generate new ${rand}`);
 
         switch(rand) {
