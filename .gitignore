@@ -4,3 +4,7 @@ node_modules/
 main
 
 .cursor/
+
+record.json
+_plans/
+_specs/
