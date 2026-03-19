@@ -479,6 +479,162 @@ body {
 }
 
 /* ===========================================
+   START SCREEN
+   =========================================== */
+#start-screen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(15, 15, 26, 0.95);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    flex-direction: row;
+    gap: 4rem;
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+}
+
+.splash-left {
+    flex: 1;
+    max-width: 480px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.splash-right {
+    flex: 1;
+    max-width: 380px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    #start-screen {
+        flex-direction: column;
+        gap: 2rem;
+        overflow-y: auto;
+        justify-content: flex-start;
+        padding-top: 2.5rem;
+    }
+    .splash-left, .splash-right {
+        flex: none;
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+/* Block letters (TETRIS title) */
+.block-letter {
+    display: inline-block;
+    font-family: 'Silkscreen', cursive;
+    font-size: clamp(2rem, 5vw, 4rem);
+    color: var(--letter-color);
+    background: color-mix(in srgb, var(--letter-color) 15%, #1A1A2E);
+    padding: 0.15em 0.2em;
+    margin: 2px;
+    border: 2px solid;
+    border-top-color: rgba(255,255,255,0.5);
+    border-left-color: rgba(255,255,255,0.4);
+    border-bottom-color: rgba(0,0,0,0.4);
+    border-right-color: rgba(0,0,0,0.3);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.25),
+                inset -2px -2px 4px rgba(0,0,0,0.2),
+                0 3px 6px rgba(0,0,0,0.4);
+}
+
+/* CTA letters (START button) */
+.cta-letter {
+    display: inline-block;
+    font-family: 'Silkscreen', cursive;
+    font-size: clamp(1rem, 2.5vw, 1.8rem);
+    color: var(--letter-color);
+    background: color-mix(in srgb, var(--letter-color) 15%, #1A1A2E);
+    padding: 0.15em 0.2em;
+    margin: 2px;
+    border: 2px solid;
+    border-top-color: rgba(255,255,255,0.5);
+    border-left-color: rgba(255,255,255,0.4);
+    border-bottom-color: rgba(0,0,0,0.4);
+    border-right-color: rgba(0,0,0,0.3);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.25),
+                inset -2px -2px 4px rgba(0,0,0,0.2),
+                0 3px 6px rgba(0,0,0,0.4);
+}
+
+/* START button container */
+.splash-cta {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.splash-cta:hover {
+    border-color: rgba(255,255,255,0.5);
+}
+
+/* Controls text */
+.splash-controls {
+    font-family: 'VT323', monospace;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: white;
+    line-height: 2;
+}
+
+.splash-controls .controls-heading {
+    color: #FF8C00;
+    font-weight: 600;
+    font-size: 1.5em;
+    margin-bottom: 1rem;
+}
+
+.splash-enter-hint {
+    margin-top: 2rem;
+    color: #FFD700;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.9em;
+    animation: pulse 2s infinite;
+}
+
+/* Preview board */
+.preview-board {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    width: 200px;
+    height: 400px;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: #0F0F1A;
+}
+
+.splash-pixel {
+    width: 20px;
+    height: 20px;
+    background: var(--grey);
+    box-sizing: border-box;
+}
+
+.splash-pixel.occupied {
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: rgba(255,255,255,0.6);
+    border-left-color: rgba(255,255,255,0.5);
+    border-bottom-color: rgba(0,0,0,0.3);
+    border-right-color: rgba(0,0,0,0.2);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.3),
+                inset -2px -2px 4px rgba(0,0,0,0.2),
+                0 2px 4px rgba(0,0,0,0.3);
+}
+
+
+/* ===========================================
    UTILITY CLASSES
    =========================================== */
 .show { opacity: 1; }
