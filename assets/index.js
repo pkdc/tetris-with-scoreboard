@@ -4,10 +4,10 @@ import gameArea from './table.js';
 import {score, setId, scoreBoardDiv, timeInput, scoreInput} from './scoreboard.js';
 import tetrisBlock from './tetris-block.js';
 import timer from './timer.js';
+import {createGameLoop} from './game-loop.js';
 
-let wait;
-let prevTime;
-let runID, waitID;
+let loopID;
+const loop = createGameLoop();
 let started = false;
 let curBlocks;
 let gameTimer;
@@ -334,7 +334,7 @@ const slowDrop = function() {
 };
 
 const fastDrop = function() {
-    wait = 0;
+    loop.requestFastDrop();
 };
 
 const moveRight = function() {
@@ -390,39 +390,26 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-const checkWait = function(timestamp) {
-    // if the fall is called right after the execution of the game (prevTime is falsy)
-    // i.e. executes if just after falling one row
-    if (!prevTime) {
-        prevTime = timestamp;
-    }
+const gameLoop = function(timestamp) {
+    if (!started) return;
 
-    let runtime = timestamp - prevTime;
-    if (runtime >= wait) {
-        slowDrop(); // fall a line if runtime of this round has exceeded the wait time (1 sec if slow, 0 if fast)
-        runID = requestAnimationFrame(run);
-    } else {
-        // continue waiting, and listening to events
-        waitID = requestAnimationFrame(checkWait);
-    }
-}
-
-const run = function() {
-    // after falling a line, reset prevTime and wait (in case it's changed by fast drop)
-    wait = 1000;
-    prevTime = null;
-    console.log("in run");
     timeDisplay.textContent = `${gameTimer.time}`;
     scoreDisplay.textContent = `Score: ${score}`;
-    if (curBlocks.endGame) {
-        gameover();
-        return;
+
+    if (loop.tick(timestamp)) {
+        slowDrop();
+
+        if (curBlocks.endGame) {
+            gameover();
+            return;
+        }
+        if (curBlocks.endSoon) {
+            scoreBoardDiv.style.willChange = "opacity";
+        }
     }
-    if (curBlocks.endSoon) {
-        scoreBoardDiv.style.willChange = "opacity";
-    }
-    waitID = requestAnimationFrame(checkWait);
-}
+
+    loopID = requestAnimationFrame(gameLoop);
+};
 
 // Start game handler (shared by ENTER key and START button)
 function startGame() {
@@ -440,7 +427,8 @@ function startGame() {
     box2.classList.remove("hidden");
     box3.classList.remove("hidden");
     gameTimer = new timer(Date.now());
-    run();
+    loop.reset();
+    loopID = requestAnimationFrame(gameLoop);
 }
 
 startBtn.addEventListener("click", startGame);
@@ -484,8 +472,7 @@ document.addEventListener("keydown", (e) => {
 })
 
 const gameover = function() {
-    cancelAnimationFrame(runID);
-    cancelAnimationFrame(waitID);
+    cancelAnimationFrame(loopID);
     enterPlayerName();
 }
 // temp game over
