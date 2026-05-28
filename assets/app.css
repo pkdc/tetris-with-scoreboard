@@ -635,6 +635,129 @@ body {
 
 
 /* ===========================================
+   PAUSE MENU
+   =========================================== */
+#pause-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 15, 26, 0.85);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+#pause-menu.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.pause-menu-card {
+    width: 90%;
+    max-width: 420px;
+    padding: 40px 30px;
+    border-radius: 16px;
+    border: 4px solid var(--game-yellow);
+    background: linear-gradient(145deg, #252540 0%, #1A1A2E 100%);
+    color: var(--game-white);
+    font-family: 'VT323', monospace;
+    text-align: center;
+    box-shadow:
+        0 0 40px rgba(255, 215, 0, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pause-menu-card h2 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2rem;
+    font-weight: 400;
+    margin: 0 0 30px;
+    letter-spacing: 2px;
+    color: var(--game-yellow);
+    text-shadow: 3px 3px 0 var(--game-orange), 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.pause-menu-actions,
+.pause-menu-confirm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+}
+
+.pause-menu-confirm p {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    color: var(--game-yellow-light);
+    margin: 0 0 8px;
+}
+
+.pause-menu-card button {
+    padding: 15px 30px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    background: linear-gradient(145deg, var(--game-yellow) 0%, var(--game-yellow-dark) 100%);
+    color: #1A1A2E;
+    box-shadow: 0 4px 0 var(--game-orange), 0 6px 20px rgba(255, 215, 0, 0.3);
+}
+
+.pause-menu-card button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 var(--game-orange), 0 10px 30px rgba(255, 215, 0, 0.4);
+}
+
+.pause-menu-card button:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 var(--game-orange), 0 4px 10px rgba(255, 215, 0, 0.3);
+}
+
+.pause-menu-card button:focus-visible {
+    outline: 3px solid var(--game-yellow-light);
+    outline-offset: 3px;
+}
+
+.pause-menu-card .hidden {
+    display: none !important;
+}
+
+#paused-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    color: var(--game-yellow);
+    text-shadow: 4px 4px 0 var(--game-orange), 0 0 24px rgba(255, 215, 0, 0.6);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 5;
+}
+
+#paused-indicator.show {
+    opacity: 1;
+}
+
+.game-box {
+    position: relative;
+}
+
+/* ===========================================
    UTILITY CLASSES
    =========================================== */
 .show { opacity: 1; }
