@@ -1,7 +1,7 @@
 "use strict";
 
 import gameArea from './table.js';
-import {score, setId, scoreBoardDiv, timeInput, scoreInput} from './scoreboard.js';
+import {score, resetScore, setId, scoreBoardDiv, timeInput, scoreInput} from './scoreboard.js';
 import tetrisBlock from './tetris-block.js';
 import timer from './timer.js';
 import {createGameLoop} from './game-loop.js';
@@ -9,6 +9,7 @@ import {createGameLoop} from './game-loop.js';
 let loopID;
 const loop = createGameLoop();
 let started = false;
+let paused = false;
 let curBlocks;
 let gameTimer;
 
@@ -319,6 +320,170 @@ box2.className = "game-box flex items-center justify-center p-2 md:p-4 hidden";
 box3.className = "side-box hidden";
 box2.append(gameBoardElement);
 
+// PAUSED indicator (inside game board wrapper)
+const pausedIndicator = document.createElement("div");
+pausedIndicator.id = "paused-indicator";
+pausedIndicator.textContent = "PAUSED";
+box2.append(pausedIndicator);
+
+// ---- Pause menu overlay ----
+const pauseMenu = document.createElement("div");
+pauseMenu.id = "pause-menu";
+
+const pauseMenuCard = document.createElement("div");
+pauseMenuCard.className = "pause-menu-card";
+
+const pauseMenuHeading = document.createElement("h2");
+pauseMenuHeading.textContent = "PAUSED";
+pauseMenuCard.append(pauseMenuHeading);
+
+const pauseMenuActions = document.createElement("div");
+pauseMenuActions.className = "pause-menu-actions";
+
+const btnResume = document.createElement("button");
+btnResume.id = "btn-resume";
+btnResume.type = "button";
+btnResume.textContent = "RESUME";
+
+const btnRestart = document.createElement("button");
+btnRestart.id = "btn-restart";
+btnRestart.type = "button";
+btnRestart.textContent = "RESTART";
+
+const btnEnd = document.createElement("button");
+btnEnd.id = "btn-end";
+btnEnd.type = "button";
+btnEnd.textContent = "END GAME";
+
+pauseMenuActions.append(btnResume, btnRestart, btnEnd);
+
+const pauseMenuConfirm = document.createElement("div");
+pauseMenuConfirm.className = "pause-menu-confirm hidden";
+
+const confirmText = document.createElement("p");
+confirmText.textContent = "Restart the game?";
+
+const btnConfirmYes = document.createElement("button");
+btnConfirmYes.id = "btn-confirm-yes";
+btnConfirmYes.type = "button";
+btnConfirmYes.textContent = "YES";
+
+const btnConfirmNo = document.createElement("button");
+btnConfirmNo.id = "btn-confirm-no";
+btnConfirmNo.type = "button";
+btnConfirmNo.textContent = "NO";
+
+pauseMenuConfirm.append(confirmText, btnConfirmYes, btnConfirmNo);
+
+pauseMenuCard.append(pauseMenuActions, pauseMenuConfirm);
+pauseMenu.append(pauseMenuCard);
+root.append(pauseMenu);
+
+// Focus trap handler while paused
+const focusTrapHandler = function(e) {
+    if (e.key !== "Tab") return;
+    // Determine currently-visible focusable buttons
+    const visibleButtons = !pauseMenuConfirm.classList.contains("hidden")
+        ? [btnConfirmYes, btnConfirmNo]
+        : [btnResume, btnRestart, btnEnd];
+    const first = visibleButtons[0];
+    const last = visibleButtons[visibleButtons.length - 1];
+    if (e.shiftKey) {
+        if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        }
+    } else {
+        if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+};
+
+const showPauseMenuActions = function() {
+    pauseMenuConfirm.classList.add("hidden");
+    pauseMenuActions.classList.remove("hidden");
+};
+
+const showPauseMenuConfirm = function() {
+    pauseMenuActions.classList.add("hidden");
+    pauseMenuConfirm.classList.remove("hidden");
+    btnConfirmNo.focus();
+};
+
+const pauseGame = function() {
+    if (!started || paused) return;
+    paused = true;
+    cancelAnimationFrame(loopID);
+    gameTimer.pauseTimer();
+    pausedIndicator.classList.add("show");
+    pauseMenu.classList.add("show");
+    showPauseMenuActions();
+    btnResume.focus();
+    document.addEventListener("keydown", focusTrapHandler);
+};
+
+const resumeGame = function() {
+    if (!paused) return;
+    paused = false;
+    gameTimer.continueTimer();
+    loop.reset();
+    pausedIndicator.classList.remove("show");
+    pauseMenu.classList.remove("show");
+    document.removeEventListener("keydown", focusTrapHandler);
+    loopID = requestAnimationFrame(gameLoop);
+};
+
+const restartGame = function() {
+    // hide menu and indicator
+    pauseMenu.classList.remove("show");
+    pausedIndicator.classList.remove("show");
+    document.removeEventListener("keydown", focusTrapHandler);
+    showPauseMenuActions();
+    paused = false;
+
+    // clear the board
+    const pixels = gameBoardElement.querySelectorAll(".table-pixel");
+    pixels.forEach((px) => {
+        if (px.classList.contains("bottom-boundary")) return;
+        px.classList.remove("occupied");
+        px.style.background = "";
+    });
+
+    // reset score + display
+    resetScore();
+    scoreDisplay.textContent = `Score: ${score}`;
+
+    // reset timer
+    gameTimer = new timer(Date.now());
+    timeDisplay.textContent = `00:00`;
+
+    // respawn
+    curBlocks = tetrisBlock.newBlocks(curBlocks, gameBoard);
+
+    // reset loop + start
+    loop.reset();
+    started = true;
+    loopID = requestAnimationFrame(gameLoop);
+};
+
+// Wire up pause menu buttons
+btnResume.addEventListener("click", resumeGame);
+btnRestart.addEventListener("click", showPauseMenuConfirm);
+btnConfirmYes.addEventListener("click", restartGame);
+btnConfirmNo.addEventListener("click", () => {
+    showPauseMenuActions();
+    btnResume.focus();
+});
+btnEnd.addEventListener("click", () => {
+    pauseMenu.classList.remove("show");
+    pausedIndicator.classList.remove("show");
+    document.removeEventListener("keydown", focusTrapHandler);
+    paused = false;
+    gameover();
+});
+
 const slowDrop = function() {
     // console.log("slow");
     curBlocks.erase();
@@ -371,6 +536,7 @@ const rotateTBlock = function() {
 document.addEventListener("keydown", (e) => {
     // Only allow controls if game has started
     if (!started) return;
+    if (paused) return;
 
     if (e.key === "ArrowDown") {
         console.log("fastDrop");
@@ -465,11 +631,23 @@ const enterPlayerName = function() {
 
 // Open menu (only works if game has started)
 document.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && started) {
+    if (e.key === "Backspace" && started && !paused) {
         console.log("Backspace");
         gameover();
     }
-})
+});
+
+// Escape key: toggle pause menu
+document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!started) return;
+    if (scoreBoardDiv.classList.contains("show")) return;
+    if (paused) {
+        resumeGame();
+    } else {
+        pauseGame();
+    }
+});
 
 const gameover = function() {
     cancelAnimationFrame(loopID);

@@ -4,6 +4,10 @@ const recordUrl = "/record/";
 
 export let score = 0;
 
+export function resetScore() {
+    score = 0;
+}
+
 export const nextRound = function(gameBoard) {
     // if 4 lines, remove it, add score
 

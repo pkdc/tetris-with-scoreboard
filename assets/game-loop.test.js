@@ -95,4 +95,27 @@ describe('createGameLoop', () => {
     test('first frame always yields dt=0', () => {
         expect(loop.tick(99999)).toBe(false);
     });
+
+    test('reset after pause: no dt spike when resuming after a large timestamp gap', () => {
+        // Simulate active loop for ~500ms
+        loop.tick(0);
+        tickFrames(loop, 0, 31); // 496ms accumulated, no drop yet
+        // Pause happens → caller cancels rAF and calls reset()
+        loop.reset();
+        // Resume 10 seconds later — without reset this would be a huge dt spike
+        // that immediately triggers a drop. With reset, first tick is dt=0
+        // and we need a full 1000ms of subsequent frames.
+        expect(loop.tick(10000)).toBe(false); // first frame after reset: dt=0
+        expect(tickFrames(loop, 10000, 62)).toBe(false); // 992ms
+        expect(loop.tick(10000 + 63 * 16)).toBe(true);   // 1008ms
+    });
+
+    test('requestFastDrop set before reset is cleared by reset', () => {
+        loop.tick(0);
+        loop.requestFastDrop();
+        loop.reset();
+        // The fast drop request should be gone — next tick should behave normally
+        expect(loop.tick(16)).toBe(false);
+        expect(loop.tick(32)).toBe(false);
+    });
 });
