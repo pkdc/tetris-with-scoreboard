@@ -1,7 +1,7 @@
 "use strict";
 
 import gameArea from './table.js';
-import {score, resetScore, setId, scoreBoardDiv, timeInput, scoreInput} from './scoreboard.js';
+import {score, resetScore, setId, scoreBoardDiv, timeInput, scoreInput, returnHomeBtn} from './scoreboard.js';
 import tetrisBlock from './tetris-block.js';
 import timer from './timer.js';
 import {createGameLoop} from './game-loop.js';
@@ -654,3 +654,51 @@ const gameover = function() {
     enterPlayerName();
 }
 // temp game over
+
+const returnHome = function() {
+    // Hide scoreboard
+    scoreBoardDiv.classList.remove("show");
+
+    // Stop any running game loop and reset flags
+    cancelAnimationFrame(loopID);
+    started = false;
+    paused = false;
+
+    // Clear the game board (preserve bottom boundary)
+    const pixels = gameBoardElement.querySelectorAll(".table-pixel");
+    pixels.forEach((px) => {
+        if (px.classList.contains("bottom-boundary")) return;
+        px.classList.remove("occupied");
+        px.style.background = "";
+    });
+
+    // Reset score and displays
+    resetScore();
+    scoreDisplay.textContent = `Score: ${score}`;
+    timeDisplay.textContent = `00:00`;
+
+    // Hide game UI, restore start screen
+    box1.classList.add("hidden");
+    box2.classList.add("hidden");
+    box3.classList.add("hidden");
+    const screen = document.getElementById("start-screen");
+    if (screen) {
+        screen.style.display = "";
+        screen.style.opacity = "";
+    }
+
+    // Prepare next game's starting piece
+    curBlocks = tetrisBlock.newBlocks(curBlocks, gameBoard);
+
+    // Restart splash animation
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        splashReset();
+        splashPiece = splashSpawn();
+        if (splashPiece) splashColour();
+        splashLastFall = 0;
+        splashLastDrift = 0;
+        splashRAF = requestAnimationFrame(splashLoop);
+    }
+};
+
+returnHomeBtn.addEventListener("click", returnHome);

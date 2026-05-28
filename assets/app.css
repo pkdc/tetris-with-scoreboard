@@ -479,6 +479,50 @@ body {
 }
 
 /* ===========================================
+   RETURN HOME BUTTON (Scoreboard)
+   =========================================== */
+.return-home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1001;
+    padding: 10px 20px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: var(--game-yellow);
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid var(--game-yellow);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.return-home-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
+}
+
+.return-home-btn:active {
+    transform: translateY(1px);
+}
+
+.return-home-btn:focus-visible {
+    outline: 3px solid var(--game-yellow-light);
+    outline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+    .return-home-btn {
+        top: 10px;
+        left: 10px;
+        padding: 8px 14px;
+        font-size: 0.6rem;
+    }
+}
+
+/* ===========================================
    START SCREEN
    =========================================== */
 #start-screen {

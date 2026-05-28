@@ -431,6 +431,13 @@ recordSubmitDiv.append(recordSubmit);
 
 recordForm.append(gameoverText, idInput, enterNameLabelDiv, enterNameInputDiv, timeLabelDiv, timeInputDiv, scoreLabelDiv, scoreInputDiv, recordSubmitDiv);
 scoreBoardDiv.append(recordForm);
+
+export const returnHomeBtn = document.createElement('button');
+returnHomeBtn.classList.add("return-home-btn");
+returnHomeBtn.setAttribute("type", "button");
+returnHomeBtn.textContent = "← HOME";
+scoreBoardDiv.append(returnHomeBtn);
+
 body.append(scoreBoardDiv);
 
 let gameId;
