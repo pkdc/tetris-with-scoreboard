@@ -4,6 +4,9 @@ const recordUrl = "/record/";
 
 export let score = 0;
 
+// Id of the just-submitted record, used to highlight the current player's row.
+let currentPlayerId = null;
+
 export function resetScore() {
     score = 0;
 }
@@ -32,6 +35,8 @@ const showUnfilledPage = function(scoreTableRow, data, whichPage) {
     }
     console.log("remaider", remainder);
     for (const [key, remainRecord] of Object.entries(remainder)) {
+        const isMe = currentPlayerId !== null && +remainRecord.id === currentPlayerId;
+
         const rankLeader = document.createElement("div");
         rankLeader.classList.add("r-cell");
         rankLeader.classList.add("rank-leader-board");
@@ -40,7 +45,7 @@ const showUnfilledPage = function(scoreTableRow, data, whichPage) {
         const nameLeader = document.createElement("div");
         nameLeader.classList.add("r-cell");
         nameLeader.classList.add("name-leader-board");
-        nameLeader.textContent = `${remainRecord.pname}`;
+        nameLeader.textContent = isMe ? `▸ ${remainRecord.pname}` : `${remainRecord.pname}`;
 
         const scoreLeader = document.createElement("div");
         scoreLeader.classList.add("r-cell");
@@ -52,12 +57,18 @@ const showUnfilledPage = function(scoreTableRow, data, whichPage) {
         timeLeader.classList.add("time-leader-board");
         timeLeader.textContent = `${remainRecord.time}`;
 
+        if (isMe) {
+            [rankLeader, nameLeader, scoreLeader, timeLeader].forEach((c) => c.classList.add("is-me"));
+        }
+
         scoreTableRow.append(rankLeader, nameLeader, scoreLeader, timeLeader);
     }
 }
 
 const showFilledPage = function(scoreTableRow, data, whichPage) {
     for (let r = 5*whichPage; r < 5*(whichPage+1); r++) {
+        const isMe = currentPlayerId !== null && +data[r].id === currentPlayerId;
+
         const rankLeader = document.createElement("div");
         rankLeader.classList.add("r-cell");
         rankLeader.classList.add("rank-leader-board");
@@ -66,7 +77,7 @@ const showFilledPage = function(scoreTableRow, data, whichPage) {
         const nameLeader = document.createElement("div");
         nameLeader.classList.add("r-cell");
         nameLeader.classList.add("name-leader-board");
-        nameLeader.textContent = `${data[r].pname}`;
+        nameLeader.textContent = isMe ? `▸ ${data[r].pname}` : `${data[r].pname}`;
 
         const scoreLeader = document.createElement("div");
         scoreLeader.classList.add("r-cell");
@@ -77,6 +88,10 @@ const showFilledPage = function(scoreTableRow, data, whichPage) {
         timeLeader.classList.add("r-cell");
         timeLeader.classList.add("time-leader-board");
         timeLeader.textContent = `${data[r].time}`;
+
+        if (isMe) {
+            [rankLeader, nameLeader, scoreLeader, timeLeader].forEach((c) => c.classList.add("is-me"));
+        }
 
         scoreTableRow.append(rankLeader, nameLeader, scoreLeader, timeLeader);
     }
@@ -119,12 +134,26 @@ const updateScoreBoard = function(cur, data) {
     recordForm.removeEventListener("submit", submitHandler);
     recordForm.addEventListener("submit", preventRefresh);
 
+    // Hall of Fame header: centred title + FIND search
+    const headerDiv = document.createElement("div");
+    headerDiv.className = "scoreboard-header";
+
+    const titleBlock = document.createElement("div");
+    titleBlock.className = "scoreboard-title";
+    const hofLabel = document.createElement("div");
+    hofLabel.className = "hof-label";
+    hofLabel.textContent = "◆ HALL OF FAME ◆";
+    const hofTitle = document.createElement("div");
+    hofTitle.className = "hof-title";
+    hofTitle.textContent = "HIGH SCORES";
+    titleBlock.append(hofLabel, hofTitle);
+
     const searchDiv = document.createElement("div");
     searchDiv.className = "search";
     const searchLabelDiv = document.createElement("div");
     searchLabelDiv.className = "search-label";
     const searchLabel = document.createElement("label");
-    searchLabel.textContent = "Search records: ";
+    searchLabel.textContent = "FIND";
     searchLabel.setAttribute("for", "search");
     searchLabelDiv.append(searchLabel);
     const searchInputDiv = document.createElement("div");
@@ -132,15 +161,17 @@ const updateScoreBoard = function(cur, data) {
     searchInput.setAttribute("id", "search");
     searchInput.setAttribute("type", "text");
     searchInput.setAttribute("name", "search");
-    searchInput.setAttribute("placeholder", "Name");
+    searchInput.setAttribute("placeholder", "NAME");
     searchInput.className = "search-input";
     searchInputDiv.append(searchInput);
     searchDiv.append(searchLabelDiv, searchInputDiv);
 
+    headerDiv.append(titleBlock, searchDiv);
+
 
     const scoreTableHeader = document.createElement("div");
     scoreTableHeader.classList.add("score-table-header");
-    const header = ["Rank", "Name", "Score", "Time"];
+    const header = ["#", "NAME", "SCORE", "TIME"];
     for (let h = 0; h < 4; h++) {
         const hCell = document.createElement("div");
         hCell.textContent = header[h];
@@ -151,6 +182,9 @@ const updateScoreBoard = function(cur, data) {
 
     // sort by score
     data.sort((a,b) => +a.score >= +b.score ? -1 : 1);
+
+    // remember the current player's record so its row can be highlighted
+    currentPlayerId = +cur.id;
 
     let rankedData = {};
     for (const [rank, rec] of data.entries()) {
@@ -191,12 +225,12 @@ const updateScoreBoard = function(cur, data) {
     // prev
     const pageNavPrev = document.createElement("div");
     pageNavPrev.classList.add("page-arrow");
-    pageNavPrev.textContent = "<";
+    pageNavPrev.textContent = "◀";
     console.log("n pageNavPrev", pageNavPrev.onclick);
 
     const prevPage = function() {
         if (whichPage >= 1) whichPage-=1;
-        pageNavCur.textContent = `${whichPage+1}/${Math.ceil(this.length/5)}`;
+        pageNavCur.textContent = `PAGE ${whichPage+1} / ${Math.ceil(this.length/5)}`;
         scoreTableRow.textContent = "";
         scoreTableRow = showRows(scoreTableRow, this, whichPage);
     };
@@ -206,20 +240,20 @@ const updateScoreBoard = function(cur, data) {
     // cur
     // if (pageNavCur !== null) pageNavCur.remove();
     const pageNavCur = document.createElement("p");
-    pageNavCur.textContent = `${whichPage+1}/${Math.ceil(data.length/5)}`;
+    pageNavCur.textContent = `PAGE ${whichPage+1} / ${Math.ceil(data.length/5)}`;
 
     // next
     // need to use callback instead of anon func
     const pageNavNext = document.createElement("div");
     pageNavNext.classList.add("page-arrow");
-    pageNavNext.textContent = ">";
+    pageNavNext.textContent = "▶";
     console.log("n pageNavNext",pageNavNext.onclick);
 
     const nextPage = function() {
         console.log("this: ", this);
         console.log("next page limit:", Math.ceil(this.length/5)-1);
         if (whichPage < Math.ceil(this.length/5)-1) whichPage+=1; // rmb whichPage starts from 0
-        pageNavCur.textContent = `${whichPage+1}/${Math.ceil(this.length/5)}`;
+        pageNavCur.textContent = `PAGE ${whichPage+1} / ${Math.ceil(this.length/5)}`;
         scoreTableRow.textContent = "";
         scoreTableRow = showRows(scoreTableRow, this, whichPage);
     };
@@ -237,7 +271,7 @@ const updateScoreBoard = function(cur, data) {
     noResultMsg.classList.add("hide");
 
     // putting all divs tgt
-    recordForm.append(endMsgDiv, searchDiv, scoreTableHeader, scoreTableRow, pageNavDiv, noResultMsg);
+    recordForm.append(headerDiv, endMsgDiv, scoreTableHeader, scoreTableRow, pageNavDiv, noResultMsg);
 
     searchInput.addEventListener("input", (e) => {
         scoreTableHeader.style.willChange = "opacity";
@@ -253,7 +287,7 @@ const updateScoreBoard = function(cur, data) {
         console.log("foundRecords: ", foundRecords);
         scoreTableRow.textContent = "";
         whichPage = 0;
-        pageNavCur.textContent = `${whichPage+1}/${Math.ceil(foundRecords.length/5)}`;
+        pageNavCur.textContent = `PAGE ${whichPage+1} / ${Math.ceil(foundRecords.length/5)}`;
 
         recordForm.append(noResultMsg);
 
@@ -357,9 +391,17 @@ recordForm.addEventListener("keydown", (e) => {
     }
 });
 
-// gameover text
+// gameover banner
+const gameoverDiamonds = document.createElement('div');
+gameoverDiamonds.className = "gameover-diamonds";
+gameoverDiamonds.textContent = "◆ ◆ ◆";
+
 const gameoverText = document.createElement('h1');
 gameoverText.textContent = "GAME OVER";
+
+const gameoverSub = document.createElement('p');
+gameoverSub.className = "gameover-sub";
+gameoverSub.textContent = "NEW HIGH SCORE";
 
 // id input
 const idInput = document.createElement('input');
@@ -367,19 +409,54 @@ idInput.setAttribute("type", "hidden");
 idInput.setAttribute("name", "id");
 idInput.setAttribute("readonly", "readonly");
 
-// name label
+// SCORE + TIME stat panels
+const statsRow = document.createElement('div');
+statsRow.className = "score-form-stats";
+
+const scorePanel = document.createElement('div');
+scorePanel.className = "stat-panel score";
+const scoreLabel = document.createElement('label');
+scoreLabel.className = "stat-label";
+scoreLabel.textContent = "SCORE";
+scoreLabel.setAttribute("for", "score");
+export const scoreInput = document.createElement('input');
+scoreInput.className = "stat-value";
+scoreInput.setAttribute("type", "number");
+scoreInput.setAttribute("name", "score");
+scoreInput.setAttribute("id", "score");
+scoreInput.setAttribute("readonly", "readonly");
+scorePanel.append(scoreLabel, scoreInput);
+
+const timePanel = document.createElement('div');
+timePanel.className = "stat-panel time";
+const timeLabel = document.createElement('label');
+timeLabel.className = "stat-label";
+timeLabel.textContent = "TIME";
+timeLabel.setAttribute("for", "time");
+export const timeInput = document.createElement('input');
+timeInput.className = "stat-value";
+timeInput.setAttribute("type", "text");
+timeInput.setAttribute("name", "time");
+timeInput.setAttribute("id", "time");
+timeInput.setAttribute("readonly", "readonly");
+timePanel.append(timeLabel, timeInput);
+
+statsRow.append(scorePanel, timePanel);
+
+// name label + input
 const enterNameLabelDiv = document.createElement('div');
 const enterNameLabel = document.createElement('label');
-enterNameLabel.textContent = "Please Enter Your Name:";
+enterNameLabel.textContent = "ENTER YOUR NAME";
 enterNameLabel.setAttribute("for", "name");
 enterNameLabelDiv.append(enterNameLabel);
 
-// name input
 const enterNameInputDiv = document.createElement('div');
 const enterNameInput = document.createElement('input');
 enterNameInput.setAttribute("type", "text");
 enterNameInput.setAttribute("name", "pname");
 enterNameInput.setAttribute("id", "name");
+enterNameInput.setAttribute("maxlength", "12");
+enterNameInput.setAttribute("autocomplete", "off");
 // Prevent Enter key from submitting form - user must click submit button
 enterNameInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -390,52 +467,19 @@ enterNameInput.addEventListener("keydown", (e) => {
 });
 enterNameInputDiv.append(enterNameInput);
 
-// score label
-const scoreLabelDiv = document.createElement('div');
-const scoreLabel = document.createElement('label');
-scoreLabel.textContent = "Score: ";
-scoreLabel.setAttribute("for", "score");
-scoreLabelDiv.append(scoreLabel);
-
-// score input
-const scoreInputDiv = document.createElement('div');
-export const scoreInput = document.createElement('input');
-scoreInput.setAttribute("type", "number");
-scoreInput.setAttribute("name", "score");
-scoreInput.setAttribute("id", "score");
-scoreInput.setAttribute("readonly", "readonly");
-scoreInputDiv.append(scoreInput);
-
-// time label
-const timeLabelDiv = document.createElement('div');
-const timeLabel = document.createElement('label');
-timeLabel.textContent = "Time: ";
-timeLabel.setAttribute("for", "time");
-timeLabelDiv.append(timeLabel);
-
-// time input
-const timeInputDiv = document.createElement('div');
-export const timeInput = document.createElement('input');
-timeInput.setAttribute("type", "text");
-timeInput.setAttribute("name", "time");
-timeInput.setAttribute("id", "time");
-timeInput.setAttribute("readonly", "readonly");
-timeInputDiv.append(timeInput);
-
-
 const recordSubmitDiv = document.createElement('div');
 const recordSubmit = document.createElement('button');
-recordSubmit.textContent = "Submit Name";
+recordSubmit.textContent = "SUBMIT ▶";
 recordSubmit.setAttribute("type", "submit");
 recordSubmitDiv.append(recordSubmit);
 
-recordForm.append(gameoverText, idInput, enterNameLabelDiv, enterNameInputDiv, timeLabelDiv, timeInputDiv, scoreLabelDiv, scoreInputDiv, recordSubmitDiv);
+recordForm.append(gameoverDiamonds, gameoverText, gameoverSub, idInput, statsRow, enterNameLabelDiv, enterNameInputDiv, recordSubmitDiv);
 scoreBoardDiv.append(recordForm);
 
 export const returnHomeBtn = document.createElement('button');
 returnHomeBtn.classList.add("return-home-btn");
 returnHomeBtn.setAttribute("type", "button");
-returnHomeBtn.textContent = "← HOME";
+returnHomeBtn.textContent = "◀ HOME";
 scoreBoardDiv.append(returnHomeBtn);
 
 body.append(scoreBoardDiv);

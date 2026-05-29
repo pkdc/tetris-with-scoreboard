@@ -19,8 +19,8 @@ const box1 = document.createElement("div");
 const box2 = document.createElement("div");
 const box3 = document.createElement("div");
 
-// Piece colours for block-letter styling
-const PIECE_COLORS = ['#00CED1','#FFD700','#FF8C00','#DA70D6','#FF6B6B','#90EE90','#6495ED'];
+// Piece colours for block-letter styling (NES palette)
+const PIECE_COLORS = ['#5ad9ff','#ffd23f','#ff9128','#c93dff','#ff3a55','#5cff7a','#3a5cff'];
 
 function shuffleColors(pool, count) {
     for (let i = pool.length - 1; i > 0; i--) {
@@ -37,9 +37,21 @@ const ctaColors   = shuffleColors([...PIECE_COLORS], 5);
 const startScreen = document.createElement("div");
 startScreen.id = "start-screen";
 
+// Top status strip
+const statusLeft = document.createElement("div");
+statusLeft.className = "splash-status splash-status-left";
+statusLeft.textContent = "v 1.0 · INSERT COIN";
+const statusRight = document.createElement("div");
+statusRight.className = "splash-status splash-status-right";
+statusRight.textContent = "1 PLAYER · NORMAL";
+
 // --- Left column ---
 const splashLeft = document.createElement("div");
 splashLeft.className = "splash-left";
+
+const arcadeLabel = document.createElement("div");
+arcadeLabel.className = "arcade-label";
+arcadeLabel.textContent = "◆ A R C A D E ◆ E D I T I O N";
 
 const titleEl = document.createElement("h1");
 titleEl.className = "splash-title";
@@ -51,29 +63,50 @@ titleEl.className = "splash-title";
     titleEl.append(span);
 });
 
+const tagline = document.createElement("p");
+tagline.className = "splash-tagline";
+tagline.innerHTML = "Stack. Clear. Climb the board.<br>Ten by twenty. Seven shapes.";
+
 const controls = document.createElement("div");
 controls.className = "splash-controls";
-controls.innerHTML = `
-    <p class="controls-heading">Controls:</p>
-    <p>UP Arrow - Rotate</p>
-    <p>LEFT / RIGHT - Move</p>
-    <p>DOWN Arrow - Fast Drop</p>
-    <p>Backspace - Open Menu</p>
-    <p class="splash-enter-hint">Press ENTER to Start</p>
-`;
+const controlsHeading = document.createElement("div");
+controlsHeading.className = "controls-heading";
+controlsHeading.textContent = "CONTROLS";
+controls.append(controlsHeading);
+[
+    ["ENTER", "START"],
+    ["◀ ▶", "MOVE"],
+    ["▼", "DROP"],
+    ["▲", "ROTATE"],
+    ["ESC", "PAUSE"],
+].forEach(([key, label]) => {
+    const row = document.createElement("div");
+    row.className = "control-row";
+    const badge = document.createElement("span");
+    badge.className = "key-badge";
+    badge.textContent = key;
+    const lbl = document.createElement("span");
+    lbl.className = "control-label";
+    lbl.textContent = label;
+    row.append(badge, lbl);
+    controls.append(row);
+});
+
+const ctaWrap = document.createElement("div");
+ctaWrap.className = "splash-cta-wrap";
 
 const startBtn = document.createElement("button");
 startBtn.id = "start-btn";
 startBtn.className = "splash-cta";
-"START".split("").forEach((ch, i) => {
-    const span = document.createElement("span");
-    span.className = "cta-letter";
-    span.textContent = ch;
-    span.style.setProperty("--letter-color", ctaColors[i]);
-    startBtn.append(span);
-});
+startBtn.textContent = "▶ START";
 
-splashLeft.append(titleEl, controls, startBtn);
+const enterHint = document.createElement("p");
+enterHint.className = "splash-enter-hint";
+enterHint.textContent = "PRESS ENTER";
+
+ctaWrap.append(startBtn, enterHint);
+
+splashLeft.append(arcadeLabel, titleEl, tagline, controls, ctaWrap);
 
 // --- Right column (preview board) ---
 const splashRight = document.createElement("div");
@@ -128,21 +161,24 @@ for (let y = 0; y < 20; y++) {
     }
 }
 
-previewWrapper.append(previewBoard);
+const demoLabel = document.createElement("div");
+demoLabel.className = "preview-demo-label";
+demoLabel.textContent = "DEMO";
+previewWrapper.append(demoLabel, previewBoard);
 splashRight.append(previewWrapper);
 
-startScreen.append(splashLeft, splashRight);
+startScreen.append(statusLeft, statusRight, splashLeft, splashRight);
 root.append(startScreen);
 
 // --- Splash board simulation (rAF-driven) ---
 const SPLASH_DEFS = [
-    { offsets: [{x:-2,y:0},{x:-1,y:0},{x:0,y:0},{x:1,y:0}], colour: "#00CED1" },
-    { offsets: [{x:-1,y:0},{x:0,y:0},{x:-1,y:1},{x:0,y:1}], colour: "#FFD700" },
-    { offsets: [{x:-1,y:0},{x:-1,y:1},{x:-1,y:2},{x:0,y:2}], colour: "#FF8C00" },
-    { offsets: [{x:-1,y:0},{x:0,y:0},{x:1,y:0},{x:0,y:1}], colour: "#DA70D6" },
-    { offsets: [{x:-1,y:0},{x:0,y:0},{x:0,y:1},{x:1,y:1}], colour: "#FF6B6B" },
-    { offsets: [{x:1,y:0},{x:0,y:0},{x:0,y:1},{x:-1,y:1}], colour: "#90EE90" },
-    { offsets: [{x:1,y:0},{x:1,y:1},{x:1,y:2},{x:0,y:2}], colour: "#6495ED" },
+    { offsets: [{x:-2,y:0},{x:-1,y:0},{x:0,y:0},{x:1,y:0}], colour: "#5ad9ff" },
+    { offsets: [{x:-1,y:0},{x:0,y:0},{x:-1,y:1},{x:0,y:1}], colour: "#ffd23f" },
+    { offsets: [{x:-1,y:0},{x:-1,y:1},{x:-1,y:2},{x:0,y:2}], colour: "#ff9128" },
+    { offsets: [{x:-1,y:0},{x:0,y:0},{x:1,y:0},{x:0,y:1}], colour: "#c93dff" },
+    { offsets: [{x:-1,y:0},{x:0,y:0},{x:0,y:1},{x:1,y:1}], colour: "#ff3a55" },
+    { offsets: [{x:1,y:0},{x:0,y:0},{x:0,y:1},{x:-1,y:1}], colour: "#5cff7a" },
+    { offsets: [{x:1,y:0},{x:1,y:1},{x:1,y:2},{x:0,y:2}], colour: "#3a5cff" },
 ];
 
 let splashPiece = null;
@@ -289,24 +325,31 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     splashRAF = requestAnimationFrame(splashLoop);
 }
 
-// scoreArea
-const scoreArea = document.createElement("div");
+// scoreArea — SCORE + TIME stat panels (left rail)
+const scorePanel = document.createElement("div");
+scorePanel.className = "stat-panel score";
+const scoreLabelEl = document.createElement("div");
+scoreLabelEl.className = "stat-label";
+scoreLabelEl.textContent = "SCORE";
 const scoreDisplay = document.createElement("p");
 scoreDisplay.id = "score-display";
-scoreDisplay.textContent = `Score: ${score}`;
-scoreDisplay.className = "text-2xl md:text-4xl font-arcade text-game-yellow mb-4";
-scoreDisplay.style.textShadow = "2px 2px 0 #FF8C00";
-// const timeText = document.createElement("p");
-// timeText.textContent = "Time";
-// timeText.style.display = "span";
+scoreDisplay.className = "stat-value";
+scoreDisplay.textContent = `${score}`;
+scorePanel.append(scoreLabelEl, scoreDisplay);
+
+const timePanel = document.createElement("div");
+timePanel.className = "stat-panel time";
+const timeLabelEl = document.createElement("div");
+timeLabelEl.className = "stat-label";
+timeLabelEl.textContent = "TIME";
 const timeDisplay = document.createElement("p");
-timeDisplay.textContent = `00:00`;
 timeDisplay.id = "time-display";
-timeDisplay.className = "text-xl md:text-3xl font-arcade text-game-teal";
-scoreArea.className = "bg-game-card/90 backdrop-blur-sm border-4 border-game-yellow rounded-xl p-4 md:p-6 shadow-[0_0_30px_rgba(255,215,0,0.3)] w-full max-w-[280px]";
-scoreArea.append(scoreDisplay,  timeDisplay);
-box1.className = "score-box flex items-center justify-center p-2 md:p-4 hidden";
-box1.append(scoreArea);
+timeDisplay.className = "stat-value";
+timeDisplay.textContent = `00:00`;
+timePanel.append(timeLabelEl, timeDisplay);
+
+box1.className = "score-box hidden";
+box1.append(scorePanel, timePanel);
 
 root.append(box1);
 root.append(box2);
@@ -315,10 +358,40 @@ root.append(box3);
 // gameBoard
 const gameBoard = new gameArea(10, 20);
 const gameBoardElement = gameBoard.generateTable();
-gameBoardElement.className = "game-table border-4 border-game-yellow rounded-lg shadow-[0_0_40px_rgba(255,215,0,0.4)] bg-game-dark/70 p-2";
-box2.className = "game-box flex items-center justify-center p-2 md:p-4 hidden";
+gameBoardElement.className = "game-table";
+box2.className = "game-box hidden";
 box3.className = "side-box hidden";
 box2.append(gameBoardElement);
+
+// Reserved NEXT panel (right rail)
+box3.innerHTML = `
+    <div class="stat-panel next-panel">
+        <div class="stat-label">NEXT<span class="soon-badge">SOON</span></div>
+        <div class="next-placeholder">
+            <div></div><div></div><div></div><div></div>
+            <div></div><div></div><div></div><div></div>
+        </div>
+        <p class="next-hint">preview piece pending</p>
+    </div>
+`;
+
+// Persistent top bar (spans all columns; hidden until the game starts)
+const topBar = document.createElement("div");
+topBar.id = "top-bar";
+topBar.classList.add("hidden");
+const topBarLeft = document.createElement("div");
+topBarLeft.className = "top-bar-left";
+const playDot = document.createElement("span");
+playDot.className = "play-dot";
+topBarLeft.append(playDot, document.createTextNode("NOW PLAYING"));
+const topBarTitle = document.createElement("div");
+topBarTitle.className = "top-bar-title";
+topBarTitle.textContent = "TETRIS";
+const topBarRight = document.createElement("div");
+topBarRight.className = "top-bar-right";
+topBarRight.textContent = "ESC · PAUSE";
+topBar.append(topBarLeft, topBarTitle, topBarRight);
+root.prepend(topBar);
 
 // PAUSED indicator (inside game board wrapper)
 const pausedIndicator = document.createElement("div");
@@ -333,9 +406,35 @@ pauseMenu.id = "pause-menu";
 const pauseMenuCard = document.createElement("div");
 pauseMenuCard.className = "pause-menu-card";
 
+const pauseDots = document.createElement("div");
+pauseDots.className = "pause-dots";
+pauseDots.textContent = "● ● ●";
+
 const pauseMenuHeading = document.createElement("h2");
 pauseMenuHeading.textContent = "PAUSED";
-pauseMenuCard.append(pauseMenuHeading);
+
+// Score / time readout (mirrors the live display; updated from the game loop)
+const pauseScoreRow = document.createElement("div");
+pauseScoreRow.className = "pause-score-row";
+const pauseScoreCol = document.createElement("div");
+const pauseScoreLabel = document.createElement("div");
+pauseScoreLabel.className = "ps-label";
+pauseScoreLabel.textContent = "SCORE";
+const pauseScoreValue = document.createElement("div");
+pauseScoreValue.className = "ps-value";
+pauseScoreValue.textContent = "0";
+pauseScoreCol.append(pauseScoreLabel, pauseScoreValue);
+const pauseTimeCol = document.createElement("div");
+const pauseTimeLabel = document.createElement("div");
+pauseTimeLabel.className = "ps-label";
+pauseTimeLabel.textContent = "TIME";
+const pauseTimeValue = document.createElement("div");
+pauseTimeValue.className = "ps-value";
+pauseTimeValue.textContent = "00:00";
+pauseTimeCol.append(pauseTimeLabel, pauseTimeValue);
+pauseScoreRow.append(pauseScoreCol, pauseTimeCol);
+
+pauseMenuCard.append(pauseDots, pauseMenuHeading, pauseScoreRow);
 
 const pauseMenuActions = document.createElement("div");
 pauseMenuActions.className = "pause-menu-actions";
@@ -375,7 +474,11 @@ btnConfirmNo.textContent = "NO";
 
 pauseMenuConfirm.append(confirmText, btnConfirmYes, btnConfirmNo);
 
-pauseMenuCard.append(pauseMenuActions, pauseMenuConfirm);
+const pauseMenuFooter = document.createElement("div");
+pauseMenuFooter.className = "pause-menu-footer";
+pauseMenuFooter.textContent = "ESC · RESUME";
+
+pauseMenuCard.append(pauseMenuActions, pauseMenuConfirm, pauseMenuFooter);
 pauseMenu.append(pauseMenuCard);
 root.append(pauseMenu);
 
@@ -453,7 +556,7 @@ const restartGame = function() {
 
     // reset score + display
     resetScore();
-    scoreDisplay.textContent = `Score: ${score}`;
+    scoreDisplay.textContent = `${score}`;
 
     // reset timer
     gameTimer = new timer(Date.now());
@@ -560,7 +663,9 @@ const gameLoop = function(timestamp) {
     if (!started) return;
 
     timeDisplay.textContent = `${gameTimer.time}`;
-    scoreDisplay.textContent = `Score: ${score}`;
+    scoreDisplay.textContent = `${score}`;
+    pauseScoreValue.textContent = `${score}`;
+    pauseTimeValue.textContent = `${gameTimer.time}`;
 
     if (loop.tick(timestamp)) {
         slowDrop();
@@ -589,9 +694,11 @@ function startGame() {
         setTimeout(() => { screen.style.display = "none"; }, 500);
     }
     // Show game elements
+    topBar.classList.remove("hidden");
     box1.classList.remove("hidden");
     box2.classList.remove("hidden");
     box3.classList.remove("hidden");
+    document.getElementById("touch-controls")?.classList.add("playing");
     gameTimer = new timer(Date.now());
     loop.reset();
     loopID = requestAnimationFrame(gameLoop);
@@ -674,13 +781,15 @@ const returnHome = function() {
 
     // Reset score and displays
     resetScore();
-    scoreDisplay.textContent = `Score: ${score}`;
+    scoreDisplay.textContent = `${score}`;
     timeDisplay.textContent = `00:00`;
 
     // Hide game UI, restore start screen
+    topBar.classList.add("hidden");
     box1.classList.add("hidden");
     box2.classList.add("hidden");
     box3.classList.add("hidden");
+    document.getElementById("touch-controls")?.classList.remove("playing");
     const screen = document.getElementById("start-screen");
     if (screen) {
         screen.style.display = "";
@@ -702,3 +811,26 @@ const returnHome = function() {
 };
 
 returnHomeBtn.addEventListener("click", returnHome);
+
+// ---- Mobile touch controls ----
+const touchMap = {
+    "btn-left":   moveLeft,
+    "btn-right":  moveRight,
+    "btn-down":   fastDrop,
+    "btn-rotate": rotateTBlock,
+};
+
+Object.entries(touchMap).forEach(([id, fn]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        if (!started || paused) return;
+        fn();
+    }, { passive: false });
+    // Click fallback (e.g. desktop testing / non-touch devices)
+    el.addEventListener("click", () => {
+        if (!started || paused) return;
+        fn();
+    });
+});

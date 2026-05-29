@@ -9,7 +9,12 @@
     <!-- Google Fonts - Retro Game Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="favicon.png-64" type="image/png">
+    <link rel="icon" href="favicon.png-32" type="image/png">
+    <link rel="icon" href="favicon.png-16" type="image/png">
 
     <!-- Tailwind CSS v4 -->
     <script type="module" src="https://esm.sh/@tailwindcss/browser@4"></script>
@@ -43,6 +48,24 @@
 <body class="bg-game-darker text-white min-h-screen overflow-hidden font-arcade">
     <div id="root" class="w-full h-screen flex items-center justify-center">
         <script type="module" src="/assets/index.js"></script>
+    </div>
+
+    <!-- Mobile touch controls (hidden on desktop via CSS) -->
+    <div id="touch-controls">
+        <div class="dpad">
+            <div class="dpad-row">
+                <div></div><div></div><div></div>
+            </div>
+            <div class="dpad-row">
+                <button id="btn-left" class="dpad-btn" type="button" aria-label="Move left">◀</button>
+                <button id="btn-down" class="dpad-btn dpad-drop" type="button" aria-label="Soft drop">▼</button>
+                <button id="btn-right" class="dpad-btn" type="button" aria-label="Move right">▶</button>
+            </div>
+        </div>
+        <button id="btn-rotate" class="rotate-btn" type="button" aria-label="Rotate">
+            <span>↻</span>
+            <small>ROTATE</small>
+        </button>
     </div>
 </body>
 </html>

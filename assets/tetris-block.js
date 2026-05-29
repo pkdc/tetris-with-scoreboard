@@ -235,7 +235,7 @@ class tetrisBlock {
             y3 = 0;
             x4 = gameBoard.getMaxX/2 + 1;
             y4 = 0;
-            blockColour = "#00CED1";
+            blockColour = "#5ad9ff";
             shape = "rect";
             break;
           case 1: // sq (O-piece) - Golden Yellow
@@ -247,7 +247,7 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2;
             y4 = 1;
-            blockColour = "#FFD700";
+            blockColour = "#ffd23f";
             shape = "sq";
             break;
           case 2: // L-piece - Orange
@@ -259,7 +259,7 @@ class tetrisBlock {
             y3 = 2;
             x4 = gameBoard.getMaxX/2;
             y4 = 2;
-            blockColour = "#FF8C00";
+            blockColour = "#ff9128";
             shape = "L";
             break;
           case 3: // T-piece - Orchid Pink
@@ -271,7 +271,7 @@ class tetrisBlock {
             y3 = 0;
             x4 = gameBoard.getMaxX/2;
             y4 = 1;
-            blockColour = "#DA70D6";
+            blockColour = "#c93dff";
             shape = "T";
             break;
           case 4: // Z-piece - Coral Red
@@ -283,7 +283,7 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2 + 1;
             y4 = 1;
-            blockColour = "#FF6B6B";
+            blockColour = "#ff3a55";
             shape = "Z";
             break;
           case 5: // S-piece - Light Green
@@ -295,7 +295,7 @@ class tetrisBlock {
             y3 = 1;
             x4 = gameBoard.getMaxX/2 - 1;
             y4 = 1;
-            blockColour = "#90EE90";
+            blockColour = "#5cff7a";
             shape = "S";
             break;
           case 6: // J-piece (L-inverse) - Cornflower Blue
@@ -307,7 +307,7 @@ class tetrisBlock {
             y3 = 2;
             x4 = gameBoard.getMaxX/2;
             y4 = 2;
-            blockColour = "#6495ED";
+            blockColour = "#3a5cff";
             shape = "L-inverse";
             break;
         }
