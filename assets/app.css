@@ -1067,3 +1067,32 @@ body {
     .score-form { padding: 24px 18px; }
     .score-form h1 { font-size: 22px; }
 }
+
+/* ===========================================
+   TOUCH DEVICES (phones + tablets)
+   Show the on-screen d-pad whenever a coarse pointer is the primary
+   input, so tablets get it too — not just narrow phone widths.
+   =========================================== */
+@media (pointer: coarse) {
+    #touch-controls.playing {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: end;
+        gap: 11px;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        padding: 10px 24px 22px;
+        background: #000;
+        border-top: 2px solid rgba(255, 255, 255, 0.15);
+        z-index: 100;
+    }
+}
+
+/* Tablets (coarse pointer, wider than a phone) keep the desktop layout,
+   so reserve space for the fixed controls and trim the board to clear them. */
+@media (pointer: coarse) and (min-width: 641px) {
+    #root { padding-bottom: 130px; }
+    .game-table {
+        --cell: min(30px, (100dvh - 290px) / 20, (100dvw - 40px) / 10);
+    }
+}
