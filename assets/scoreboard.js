@@ -476,11 +476,11 @@ recordSubmitDiv.append(recordSubmit);
 recordForm.append(gameoverDiamonds, gameoverText, gameoverSub, idInput, statsRow, enterNameLabelDiv, enterNameInputDiv, recordSubmitDiv);
 scoreBoardDiv.append(recordForm);
 
-export const returnHomeBtn = document.createElement('button');
-returnHomeBtn.classList.add("return-home-btn");
-returnHomeBtn.setAttribute("type", "button");
-returnHomeBtn.textContent = "◀ HOME";
-scoreBoardDiv.append(returnHomeBtn);
+// export const returnHomeBtn = document.createElement('button');
+// returnHomeBtn.classList.add("return-home-btn");
+// returnHomeBtn.setAttribute("type", "button");
+// returnHomeBtn.textContent = "◀ HOME";
+// scoreBoardDiv.append(returnHomeBtn);
 
 body.append(scoreBoardDiv);
 
