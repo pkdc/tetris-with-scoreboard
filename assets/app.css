@@ -94,7 +94,22 @@ body {
 #top-bar.hidden { display: none; }
 .top-bar-title { font-size: 18px; color: var(--text); letter-spacing: 4px; }
 .top-bar-left  { color: var(--text); display: flex; align-items: center; gap: 10px; }
-.top-bar-right { color: var(--text-dim); }
+.top-bar-right {
+    /* Reset native <button> chrome — reads as a plain hint on desktop */
+    appearance: none;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    letter-spacing: inherit;
+    color: var(--text-dim);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+.top-bar-right:hover { color: var(--text); }
+.top-bar-right .pause-glyph { display: none; }   /* touch-only, revealed below */
 
 .play-dot {
     display: inline-block;
@@ -918,7 +933,7 @@ body {
 .dpad-row { display: grid; grid-template-columns: repeat(3, 36px); gap: 4px; }
 
 .dpad-btn {
-    width: 30px; height: 30px;
+    width: 42px; height: 42px;
     background: #000;
     border: 2px solid var(--text);
     color: var(--text);
@@ -1085,6 +1100,41 @@ body {
         background: #000;
         border-top: 2px solid rgba(255, 255, 255, 0.15);
         z-index: 100;
+    }
+
+    /* Touch devices have no ESC key — turn the top-bar hint into a real,
+       clearly-tappable gold pause pill with the NES brick bevel. */
+    .top-bar-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        min-height: 32px;
+        background: var(--accent);
+        color: #000;
+        border-radius: 3px;
+        box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+                    inset -2px -2px 0 rgba(0, 0, 0, 0.4),
+                    0 0 0 2px #000;
+    }
+    .top-bar-right:hover { color: #000; }
+    .top-bar-right:active { opacity: 0.8; }
+    .top-bar-right .pause-glyph {
+        display: inline;
+        font-size: 11px;
+        letter-spacing: -1px;
+    }
+    .top-bar-right .pause-hint {
+        font-family: var(--font-title);
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+    /* Swap the keyboard wording for a touch-appropriate label */
+    .top-bar-right .pause-hint { font-size: 0; }
+    .top-bar-right .pause-hint::after {
+        content: "PAUSE";
+        font-size: 8px;
+        letter-spacing: 1px;
     }
 }
 

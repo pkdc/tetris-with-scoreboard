@@ -387,9 +387,20 @@ topBarLeft.append(playDot, document.createTextNode("NOW PLAYING"));
 const topBarTitle = document.createElement("div");
 topBarTitle.className = "top-bar-title";
 topBarTitle.textContent = "TETRIS";
-const topBarRight = document.createElement("div");
+const topBarRight = document.createElement("button");
+topBarRight.id = "pause-btn";
 topBarRight.className = "top-bar-right";
-topBarRight.textContent = "ESC · PAUSE";
+topBarRight.type = "button";
+topBarRight.setAttribute("aria-label", "Pause game");
+// Pause glyph shows on touch devices; keyboard hint shows on desktop.
+const pauseGlyph = document.createElement("span");
+pauseGlyph.className = "pause-glyph";
+pauseGlyph.setAttribute("aria-hidden", "true");
+pauseGlyph.textContent = "❚❚";
+const pauseHint = document.createElement("span");
+pauseHint.className = "pause-hint";
+pauseHint.textContent = "ESC · PAUSE";
+topBarRight.append(pauseGlyph, pauseHint);
 topBar.append(topBarLeft, topBarTitle, topBarRight);
 root.prepend(topBar);
 
@@ -744,9 +755,8 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Escape key: toggle pause menu
-document.addEventListener("keydown", (e) => {
-    if (e.key !== "Escape") return;
+// Toggle pause from any source (ESC key or on-screen button)
+const togglePause = function() {
     if (!started) return;
     if (scoreBoardDiv.classList.contains("show")) return;
     if (paused) {
@@ -754,7 +764,20 @@ document.addEventListener("keydown", (e) => {
     } else {
         pauseGame();
     }
+};
+
+// Escape key: toggle pause menu
+document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    togglePause();
 });
+
+// On-screen pause button (primary control for touch / coarse-pointer devices)
+topBarRight.addEventListener("click", togglePause);
+topBarRight.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    togglePause();
+}, { passive: false });
 
 const gameover = function() {
     cancelAnimationFrame(loopID);
