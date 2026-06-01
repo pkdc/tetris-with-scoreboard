@@ -387,20 +387,9 @@ topBarLeft.append(playDot, document.createTextNode("NOW PLAYING"));
 const topBarTitle = document.createElement("div");
 topBarTitle.className = "top-bar-title";
 topBarTitle.textContent = "TETRIS";
-const topBarRight = document.createElement("button");
-topBarRight.id = "pause-btn";
+const topBarRight = document.createElement("div");
 topBarRight.className = "top-bar-right";
-topBarRight.type = "button";
-topBarRight.setAttribute("aria-label", "Pause game");
-// Pause glyph shows on touch devices; keyboard hint shows on desktop.
-const pauseGlyph = document.createElement("span");
-pauseGlyph.className = "pause-glyph";
-pauseGlyph.setAttribute("aria-hidden", "true");
-pauseGlyph.textContent = "❚❚";
-const pauseHint = document.createElement("span");
-pauseHint.className = "pause-hint";
-pauseHint.textContent = "ESC · PAUSE";
-topBarRight.append(pauseGlyph, pauseHint);
+topBarRight.textContent = "ESC · PAUSE";   // keyboard hint (desktop only)
 topBar.append(topBarLeft, topBarTitle, topBarRight);
 root.prepend(topBar);
 
@@ -772,12 +761,16 @@ document.addEventListener("keydown", (e) => {
     togglePause();
 });
 
-// On-screen pause button (primary control for touch / coarse-pointer devices)
-topBarRight.addEventListener("click", togglePause);
-topBarRight.addEventListener("touchstart", (e) => {
-    e.preventDefault();
-    togglePause();
-}, { passive: false });
+// On-screen pause button — sits in the touch-controls bar, between the
+// d-pad and rotate, so it's within thumb reach on phones/tablets.
+const pauseBtn = document.getElementById("btn-pause");
+if (pauseBtn) {
+    pauseBtn.addEventListener("click", togglePause);
+    pauseBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        togglePause();
+    }, { passive: false });
+}
 
 const gameover = function() {
     cancelAnimationFrame(loopID);
