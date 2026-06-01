@@ -2,7 +2,7 @@
 	{
 		"id": 1,
 		"pname": "David",
-		"score": "10500",
+		"score": "105000",
 		"time": "23:21"
 	},
 	{
@@ -14,7 +14,7 @@
 	{
 		"id": 3,
 		"pname": "John",
-		"score": "500",
+		"score": "50000",
 		"time": "05:21"
 	},
 	{
@@ -49,122 +49,14 @@
 	},
 	{
 		"id": 9,
-		"pname": "t",
+		"pname": "King",
 		"score": "0",
-		"time": "00:07"
+		"time": "00:06"
 	},
 	{
 		"id": 10,
-		"pname": "u",
+		"pname": "iam",
 		"score": "0",
-		"time": "00:02"
-	},
-	{
-		"id": 11,
-		"pname": "n",
-		"score": "0",
-		"time": "00:02"
-	},
-	{
-		"id": 12,
-		"pname": "x",
-		"score": "0",
-		"time": "00:01"
-	},
-	{
-		"id": 13,
-		"pname": "j",
-		"score": "0",
-		"time": "01:06"
-	},
-	{
-		"id": 14,
-		"pname": "f",
-		"score": "0",
-		"time": "00:02"
-	},
-	{
-		"id": 15,
-		"pname": "h",
-		"score": "0",
-		"time": "00:00"
-	},
-	{
-		"id": 16,
-		"pname": "G",
-		"score": "0",
-		"time": "00:21"
-	},
-	{
-		"id": 17,
-		"pname": "e",
-		"score": "0",
-		"time": "00:24"
-	},
-	{
-		"id": 18,
-		"pname": "k",
-		"score": "100",
-		"time": "00:41"
-	},
-	{
-		"id": 19,
-		"pname": "Dave",
-		"score": "1800",
-		"time": "02:18"
-	},
-	{
-		"id": 20,
-		"pname": "A",
-		"score": "0",
-		"time": "00:08"
-	},
-	{
-		"id": 21,
-		"pname": "r",
-		"score": "0",
-		"time": "00:17"
-	},
-	{
-		"id": 22,
-		"pname": "e",
-		"score": "0",
-		"time": "00:01"
-	},
-	{
-		"id": 23,
-		"pname": "Hi",
-		"score": "0",
-		"time": "00:01"
-	},
-	{
-		"id": 24,
-		"pname": "hello",
-		"score": "0",
-		"time": "00:20"
-	},
-	{
-		"id": 25,
-		"pname": "hi",
-		"score": "0",
-		"time": "00:05"
-	},
-	{
-		"id": 26,
-		"pname": "M",
-		"score": "0",
-		"time": "00:36"
-	},
-	{
-		"id": 27,
-		"pname": "D",
-		"score": "0",
-		"time": "00:13"
-	},
-	{
-		"id": 28,
-		"pname": "A",
-		"score": "0",
-		"time": "00:09"
+		"time": "01:35"
 	}
 ]
